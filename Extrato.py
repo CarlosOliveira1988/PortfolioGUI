@@ -2,7 +2,6 @@ import pandas as pd
 import streamlit as st
 import numpy as np
 import locale
-import altair as alt
 
 
 file = r"D:\Dudu\Finanças\Investimentos\Mercado Financeiro\Extrato Poupança.xlsx"
@@ -10,7 +9,7 @@ file = r"D:\Dudu\Finanças\Investimentos\Mercado Financeiro\Extrato Poupança.xl
 
 class ExtratoDataframe:
     def __init__(self):
-        self.columns_list = [
+        self.__columns_list = [
             "Mercado",
             "Ticker",
             "Operação",
@@ -28,15 +27,15 @@ class ExtratoDataframe:
             "Custo Total",
             "Notas",
         ]
-        self.extrato = pd.DataFrame(columns=self.columns_list)
+        self.__df = pd.DataFrame(columns=self.__columns_list)
     
     def __setupNAN(self, column_list, nan_value):
         for column in column_list:
-            self.extrato[column] = self.extrato[column].replace(np.nan, nan_value)
+            self.__df[column] = self.__df[column].replace(np.nan, nan_value)
     
     def __setupDateColumns(self):
-        self.extrato["Data"] = pd.to_datetime(self.extrato["Data"], dayfirst=True, errors='coerce').dt.date
-        self.extrato["Vencimento"] = pd.to_datetime(self.extrato["Vencimento"], dayfirst=True, errors='coerce').dt.date
+        self.__df["Data"] = pd.to_datetime(self.__df["Data"]).dt.date
+        self.__df["Vencimento"] = pd.to_datetime(self.__df["Vencimento"]).dt.date
     
     def __setupStringColumns(self):
         self.__setupNAN(["Mercado", "Ticker", "Operação", "Rentabilidade Contratada", "Indexador", "Notas"], "")
@@ -45,81 +44,111 @@ class ExtratoDataframe:
         self.__setupNAN(["Quantidade", "Preço Unitário", "Preço Total", "Taxas", "IR", "Dividendos", "JCP", "Custo Total"], 0.0)
     
     def __defineDisplayedColumns(self):
-        self.extrato = self.extrato[self.columns_list]
+        self.__df = self.__df[self.__columns_list]
     
     def read(self, file):
-        self.extrato = pd.read_excel(file)
+        self.__df = pd.read_excel(file)
         self.__defineDisplayedColumns()
         self.__setupStringColumns()
         self.__setupNumberColumns()
         self.__setupDateColumns()
-        return self.extrato
+        return self.__df
 
 
 class ExtratoGUI:
     def __init__(self):
         locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
-        self.extrato = pd.DataFrame()
-        self.filtered_extrato = pd.DataFrame()
+        self.__df = pd.DataFrame()
+        self.__filtered_df = pd.DataFrame()
+        self.__formatted_df = pd.DataFrame()
 
     def __showMainTitle(self):
         st.write('# Extrato')
-        st.write('Veja a seguir todo o histórico de transações realizadas ao longo do período.')
+        st.write('#### Histórico de transações')
+    
+    def __getMoneyString(self, value):
+        return locale.currency(float(value), grouping=True)
     
     def __setupMoney(self, column_list):
         for column in column_list:
-            self.filtered_extrato[column] = self.filtered_extrato.apply(lambda x: locale.currency(float(x[column])), axis=1)
+            self.__formatted_df[column] = self.__formatted_df.apply(lambda x: self.__getMoneyString(x[column]), axis=1)
     
     def __setupMoneyColumns(self):
         self.__setupMoney(["Preço Unitário", "Preço Total", "Taxas", "IR", "Dividendos", "JCP", "Custo Total"])
     
     def __setupPercentageColumns(self):
-        self.filtered_extrato.loc[:, "Rentabilidade Contratada"] = self.filtered_extrato["Rentabilidade Contratada"].map(lambda x: '{:.2%}'.format(x) if (x != "") else "")
+        self.__formatted_df.loc[:, "Rentabilidade Contratada"] = self.__formatted_df["Rentabilidade Contratada"].map(lambda x: '{:.2%}'.format(x) if (x != "") else "")
     
     def __setupQuantityColumns(self):
-        self.filtered_extrato.loc[:, "Quantidade"] = self.filtered_extrato["Quantidade"].map(lambda x: locale.str(x))
+        self.__formatted_df.loc[:, "Quantidade"] = self.__formatted_df["Quantidade"].map(lambda x: locale.str(x))
     
     def __setupNAN(self):
-        self.filtered_extrato.fillna("")
-        self.filtered_extrato["Vencimento"].replace({pd.NaT: ""}, inplace=True)
+        self.__formatted_df.fillna("")
+        self.__formatted_df["Vencimento"].replace({pd.NaT: ""}, inplace=True)
     
     def __showDataframe(self):
         self.__setupNAN()
         self.__setupMoneyColumns()
         self.__setupPercentageColumns()
         self.__setupQuantityColumns()
-        st.write("", self.filtered_extrato.astype(str))
+        st.write("", self.__formatted_df.astype(str))
+
+    def __showBarChart(self):
+        # Transfers
+        df1 = self.__filtered_df.loc[self.__filtered_df['Operação'] == "Transferência"] # '+'
+        df1 = df1[["Data", "Preço Unitário"]]
+        df1 = df1.rename(columns={'Preço Unitário':'Transferência'})
+        
+        # Rescues
+        df2 = self.__filtered_df.loc[self.__filtered_df['Operação'] == "Resgate"] # '-'
+        df2["Preço Unitário"] = df2["Preço Unitário"] * (-1)
+        df2 = df2[["Data", "Preço Unitário"]]
+        df2 = df2.rename(columns={'Preço Unitário':'Resgate'})
+        
+        # Concatenate the dataframes
+        df = pd.concat([df1, df2])
+        df = df.rename(columns={'Data':'index'}).set_index('index')
+        
+        # Show the information
+        transferencias = df['Transferência'].sum()
+        resgates = df['Resgate'].sum() * -1
+        saldo = transferencias - resgates
+        st.write('#### Fluxo de entradas e saídas da conta')
+        st.write('Transferências: ', self.__getMoneyString(transferencias))
+        st.write('Resgates: ', self.__getMoneyString(resgates))
+        st.write('Saldo: ', self.__getMoneyString(saldo))
+        st.bar_chart(df)
 
     def __showMercadoFilter(self):
-        mercado_default_series = self.filtered_extrato["Mercado"].drop_duplicates()
+        mercado_default_series = self.__filtered_df["Mercado"].drop_duplicates()
         mercado_list = st.sidebar.multiselect('Mercado:', mercado_default_series.sort_values())
         if mercado_list:
-            self.filtered_extrato = self.filtered_extrato.loc[self.filtered_extrato['Mercado'].isin(mercado_list)]
+            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df['Mercado'].isin(mercado_list)]
 
     def __showTickerFilter(self):
         ticker_default_list = ["Exibir todos"]
-        ticker_default_list.extend(self.filtered_extrato["Ticker"].drop_duplicates().sort_values())
+        ticker_default_list.extend(self.__filtered_df["Ticker"].drop_duplicates().sort_values())
         ticker_option = st.sidebar.selectbox('Ticker:', ticker_default_list)
         if ticker_option != "Exibir todos":
-            self.filtered_extrato = self.filtered_extrato.loc[self.filtered_extrato['Ticker'] == ticker_option]
+            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df['Ticker'] == ticker_option]
 
     def __showOperationFilter(self):
         op_default_list = ["Exibir todas"]
-        op_default_list.extend(self.filtered_extrato["Operação"].drop_duplicates().sort_values())
+        op_default_list.extend(self.__filtered_df["Operação"].drop_duplicates().sort_values())
         op_option = st.sidebar.selectbox('Operação:', op_default_list)
         if op_option != "Exibir todas":
-            self.filtered_extrato = self.filtered_extrato.loc[self.filtered_extrato['Operação'] == op_option]
+            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df['Operação'] == op_option]
     
     def __showDataFilter(self):
-        start_date = self.filtered_extrato["Data"].min()
-        end_date = self.filtered_extrato["Data"].max()
+        start_date = self.__filtered_df["Data"].min()
+        end_date = self.__filtered_df["Data"].max()
         if start_date == end_date:
             date_option = st.sidebar.slider('Período:', disabled=True)
         else:
             date_option = st.sidebar.slider('Período:', min_value=start_date, max_value=end_date, value=(start_date, end_date))
             init_date = date_option[0]
             finish_date = date_option[1]
-            self.filtered_extrato = self.filtered_extrato.loc[(init_date <= self.filtered_extrato['Data']) & (self.filtered_extrato['Data'] <= finish_date)]
+            self.__filtered_df = self.__filtered_df.loc[(init_date <= self.__filtered_df['Data']) & (self.__filtered_df['Data'] <= finish_date)]
 
     def __showSideBar(self):
         self.__showMercadoFilter()
@@ -128,11 +157,13 @@ class ExtratoGUI:
         self.__showDataFilter()
 
     def setDataframe(self, dataframe):
-        self.extrato = dataframe
-        self.filtered_extrato = self.extrato.copy()
+        self.__df = dataframe
+        self.__filtered_df = self.__df.copy()
         self.__showMainTitle()
         self.__showSideBar()
+        self.__formatted_df = self.__filtered_df.copy()
         self.__showDataframe()
+        self.__showBarChart()
 
 
 extrato = ExtratoDataframe()
