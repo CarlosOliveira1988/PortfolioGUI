@@ -93,17 +93,17 @@ class ExtratoGUI:
         self.__setupQuantityColumns()
         st.write("", self.__formatted_df.astype(str))
 
-    def __showBarChart(self):
+    def __showAccountBarChart(self):
         # Transfers
         df1 = self.__filtered_df.loc[self.__filtered_df['Operação'] == "Transferência"] # '+'
-        df1 = df1[["Data", "Preço Unitário"]]
-        df1 = df1.rename(columns={'Preço Unitário':'Transferência'})
+        df1 = df1[["Data", "Preço Total"]]
+        df1 = df1.rename(columns={'Preço Total':'Transferência'})
         
         # Rescues
         df2 = self.__filtered_df.loc[self.__filtered_df['Operação'] == "Resgate"] # '-'
-        df2["Preço Unitário"] = df2["Preço Unitário"] * (-1)
-        df2 = df2[["Data", "Preço Unitário"]]
-        df2 = df2.rename(columns={'Preço Unitário':'Resgate'})
+        df2["Preço Total"] = df2["Preço Total"] * (-1)
+        df2 = df2[["Data", "Preço Total"]]
+        df2 = df2.rename(columns={'Preço Total':'Resgate'})
         
         # Concatenate the dataframes
         df = pd.concat([df1, df2])
@@ -116,6 +116,32 @@ class ExtratoGUI:
         st.write('#### Fluxo de entradas e saídas da conta')
         st.write('Transferências: ', self.__getMoneyString(transferencias))
         st.write('Resgates: ', self.__getMoneyString(resgates))
+        st.write('Saldo: ', self.__getMoneyString(saldo))
+        st.bar_chart(df)
+
+    def __showAssetsBarChart(self):
+        # Sell
+        df1 = self.__filtered_df.loc[self.__filtered_df['Operação'] == "Venda"] # '+'
+        df1 = df1[["Data", "Preço Total"]]
+        df1 = df1.rename(columns={'Preço Total':'Venda'})
+        
+        # Buy
+        df2 = self.__filtered_df.loc[self.__filtered_df['Operação'] == "Compra"] # '-'
+        df2["Preço Total"] = df2["Preço Total"] * (-1)
+        df2 = df2[["Data", "Preço Total"]]
+        df2 = df2.rename(columns={'Preço Total':'Compra'})
+        
+        # Concatenate the dataframes
+        df = pd.concat([df1, df2])
+        df = df.rename(columns={'Data':'index'}).set_index('index')
+        
+        # Show the information
+        vendas = df['Venda'].sum()
+        compras = df['Compra'].sum() * -1
+        saldo = vendas - compras
+        st.write('#### Fluxo de compras e vendas de ativos')
+        st.write('Compras: ', self.__getMoneyString(compras))
+        st.write('Vendas: ', self.__getMoneyString(vendas))
         st.write('Saldo: ', self.__getMoneyString(saldo))
         st.bar_chart(df)
 
@@ -163,7 +189,8 @@ class ExtratoGUI:
         self.__showSideBar()
         self.__formatted_df = self.__filtered_df.copy()
         self.__showDataframe()
-        self.__showBarChart()
+        self.__showAccountBarChart()
+        self.__showAssetsBarChart()
 
 
 extrato = ExtratoDataframe()
