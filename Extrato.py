@@ -93,7 +93,7 @@ class ExtratoGUI:
         self.__setupQuantityColumns()
         st.write("", self.__formatted_df.astype(str))
 
-    def __showAccountBarChart(self):
+    def __showAccountBarChart(self, sum_flag=True):
         # Transfers
         df1 = self.__filtered_df.loc[self.__filtered_df['Operação'] == "Transferência"] # '+'
         df1 = df1[["Data", "Preço Total"]]
@@ -110,16 +110,29 @@ class ExtratoGUI:
         df = df.rename(columns={'Data':'index'}).set_index('index')
         
         # Show the information
-        transferencias = df['Transferência'].sum()
-        resgates = df['Resgate'].sum() * -1
-        saldo = transferencias - resgates
-        st.write('#### Fluxo de entradas e saídas da conta')
-        st.write('Transferências: ', self.__getMoneyString(transferencias))
-        st.write('Resgates: ', self.__getMoneyString(resgates))
-        st.write('Saldo: ', self.__getMoneyString(saldo))
+        if sum_flag:
+            transferencias = df['Transferência'].sum()
+            resgates = df['Resgate'].sum() * -1
+        else:
+            df["Transferência"] = df["Transferência"].notnull().astype("int")
+            df["Resgate"] = df["Resgate"].notnull().astype("int") * -1
+            transferencias = df['Transferência'].sum()
+            resgates = df['Resgate'].sum() * -1
+        delta = transferencias - resgates
+        
+        if sum_flag:
+            st.write('#### Fluxo financeiro de entradas e saídas da conta')
+            st.write('Transferências: ', self.__getMoneyString(transferencias))
+            st.write('Resgates: ', self.__getMoneyString(resgates))
+            st.write('Diferença: ', self.__getMoneyString(delta))
+        else:
+            st.write('#### Fluxo quantitativo de entradas e saídas da conta')
+            st.write('Transferências: ', transferencias)
+            st.write('Resgates: ', resgates)
+            st.write('Diferença: ', delta)
         st.bar_chart(df)
 
-    def __showAssetsBarChart(self):
+    def __showAssetsBarChart(self, sum_flag=True):
         # Sell
         df1 = self.__filtered_df.loc[self.__filtered_df['Operação'] == "Venda"] # '+'
         df1 = df1[["Data", "Preço Total"]]
@@ -136,13 +149,26 @@ class ExtratoGUI:
         df = df.rename(columns={'Data':'index'}).set_index('index')
         
         # Show the information
-        vendas = df['Venda'].sum()
-        compras = df['Compra'].sum() * -1
-        saldo = vendas - compras
-        st.write('#### Fluxo de compras e vendas de ativos')
-        st.write('Compras: ', self.__getMoneyString(compras))
-        st.write('Vendas: ', self.__getMoneyString(vendas))
-        st.write('Saldo: ', self.__getMoneyString(saldo))
+        if sum_flag:
+            vendas = df['Venda'].sum()
+            compras = df['Compra'].sum() * -1
+        else:
+            df["Venda"] = df["Venda"].notnull().astype("int")
+            df["Compra"] = df["Compra"].notnull().astype("int") * -1
+            vendas = df['Venda'].sum()
+            compras = df['Compra'].sum() * -1
+        delta = vendas - compras
+        
+        if sum_flag:
+            st.write('#### Fluxo financeiro de compras e vendas de ativos')
+            st.write('Vendas: ', self.__getMoneyString(vendas))
+            st.write('Compras: ', self.__getMoneyString(compras))
+            st.write('Diferença: ', self.__getMoneyString(delta))
+        else:
+            st.write('#### Fluxo quantitativo de compras e vendas de ativos')
+            st.write('Vendas: ', vendas)
+            st.write('Compras: ', compras)
+            st.write('Diferença: ', delta)
         st.bar_chart(df)
 
     def __showMercadoFilter(self):
@@ -190,7 +216,9 @@ class ExtratoGUI:
         self.__formatted_df = self.__filtered_df.copy()
         self.__showDataframe()
         self.__showAccountBarChart()
+        self.__showAccountBarChart(sum_flag=False)
         self.__showAssetsBarChart()
+        self.__showAssetsBarChart(sum_flag=False)
 
 
 extrato = ExtratoDataframe()
