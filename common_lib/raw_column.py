@@ -1,6 +1,6 @@
-class ExtratoRawColumn:
+class RawColumn:
     def __init__(self, column_name: str, column_type: str):
-        """Structure to define Extrato column parameters.
+        """Structure to define some column parameters.
 
         Args:
             column_name (str): the column title
