@@ -7,6 +7,7 @@ class ExtratoSideBar:
     def __init__(self):
         """Structure to draw an Extrato Filter's Side Bar."""
         self.extrato = ExtratoDataframe()
+        self.__columns_object = self.extrato.getColumnsObject()
         
         # Dataframes for common usage
         self.__filtered_df = self.extrato.getNotNanDataframe()
@@ -20,27 +21,27 @@ class ExtratoSideBar:
         st.sidebar.subheader('Filtros')
     
     def __showMarketFilter(self) -> list:
-        column = self.extrato.extrato_columns._market_col.getName()
+        column = self.__columns_object._market_col.getName()
         market_default_series = self.__filtered_df[column].drop_duplicates()
         self.__market_list_filter = st.sidebar.multiselect('Mercado:', market_default_series.sort_values())
         self.__applyMarketFilter()
 
     def __showTickerFilter(self) -> str:
-        column = self.extrato.extrato_columns._ticker_col.getName()
+        column = self.__columns_object._ticker_col.getName()
         ticker_default_list = ["Exibir todos"]
         ticker_default_list.extend(self.__filtered_df[column].drop_duplicates().sort_values())
         self.__ticker_option_str_filter = st.sidebar.selectbox('Ticker:', ticker_default_list)
         self.__applyTickerFilter()
 
     def __showOperationFilter(self) -> str:
-        column = self.extrato.extrato_columns._operation_col.getName()
+        column = self.__columns_object._operation_col.getName()
         op_default_list = ["Exibir todas"]
         op_default_list.extend(self.__filtered_df[column].drop_duplicates().sort_values())
         self.__operation_option_str_filter = st.sidebar.selectbox('Operação:', op_default_list)
         self.__applyOperationFilter()
     
     def __showDateFilter(self) -> tuple:
-        column = self.extrato.extrato_columns._date_col.getName()
+        column = self.__columns_object._date_col.getName()
         start_date = self.__filtered_df[column].min()
         end_date = self.__filtered_df[column].max()
         if self.__filtered_df.empty:
@@ -66,25 +67,25 @@ class ExtratoSideBar:
         self.__showDateFilter()
     
     def __applyMarketFilter(self) -> None:
-        column = self.extrato.extrato_columns._market_col.getName()
+        column = self.__columns_object._market_col.getName()
         if self.__market_list_filter:
             self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column].isin(self.__market_list_filter)]
             self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column].isin(self.__market_list_filter)]
     
     def __applyTickerFilter(self) -> None:
-        column = self.extrato.extrato_columns._ticker_col.getName()
+        column = self.__columns_object._ticker_col.getName()
         if self.__ticker_option_str_filter != "Exibir todos":
             self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column] == self.__ticker_option_str_filter]
             self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column] == self.__ticker_option_str_filter]
     
     def __applyOperationFilter(self) -> None:
-        column = self.extrato.extrato_columns._operation_col.getName()
+        column = self.__columns_object._operation_col.getName()
         if self.__operation_option_str_filter != "Exibir todas":
             self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column] == self.__operation_option_str_filter]
             self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column] == self.__operation_option_str_filter]
     
     def __applyDateFilter(self) -> None:
-        column = self.extrato.extrato_columns._date_col.getName()
+        column = self.__columns_object._date_col.getName()
         if self.__start_date and self.__end_date:
             self.__filtered_df = self.__filtered_df.loc[(self.__start_date <= self.__filtered_df[column]) & (self.__filtered_df[column] <= self.__end_date)]
             self.__filtered_fmtdf = self.__filtered_fmtdf.loc[(self.__start_date <= self.__filtered_fmtdf[column]) & (self.__filtered_fmtdf[column] <= self.__end_date)]

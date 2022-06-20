@@ -2,7 +2,10 @@ from common_lib.raw_column import RawColumn
 
 class ColumnsInterface:
     def __init__(self):
-        """Structure to define a group of columns."""
+        """Structure to define a group of columns to make easier handling Pandas dataframes.
+        
+        It is useful to help while formatting and applying NaN values in its cells.
+        """
         self.__columns_name_list = []
         self.__columns_type_list = []
         self.__columns_nan_list = []

@@ -8,6 +8,7 @@ class ExtratoGUI:
     def __init__(self):
         """Structure used to show tables and graphs related to Extrato."""
         self.__side_bar = ExtratoSideBar()
+        self.__columns_object = self.__side_bar.extrato.getColumnsObject()
         self.__filtered_fmtdf = self.__side_bar.getFilteredFormattedDataframe()
         self.__filtered_date_df = self.__side_bar.getDateFilteredDataframe()
 
@@ -19,18 +20,18 @@ class ExtratoGUI:
         st.write("", self.__filtered_fmtdf.astype(str))
 
     def __getPositiveDataframe(self, op_string):
-        op_column = self.__side_bar.extrato.extrato_columns._operation_col.getName()
-        total_column = self.__side_bar.extrato.extrato_columns._total_price_col.getName()
-        date_column = self.__side_bar.extrato.extrato_columns._date_col.getName()
+        op_column = self.__columns_object._operation_col.getName()
+        total_column = self.__columns_object._total_price_col.getName()
+        date_column = self.__columns_object._date_col.getName()
         df1 = self.__filtered_date_df.loc[self.__filtered_date_df[op_column] == op_string]
         df1 = df1[[date_column, total_column]]
         df1 = df1.rename(columns={total_column: op_string})
         return df1
 
     def __getNegativeDataframe(self, op_string):
-        op_column = self.__side_bar.extrato.extrato_columns._operation_col.getName()
-        total_column = self.__side_bar.extrato.extrato_columns._total_price_col.getName()
-        date_column = self.__side_bar.extrato.extrato_columns._date_col.getName()
+        op_column = self.__columns_object._operation_col.getName()
+        total_column = self.__columns_object._total_price_col.getName()
+        date_column = self.__columns_object._date_col.getName()
         df2 = self.__filtered_date_df.loc[self.__filtered_date_df[op_column] == op_string]
         df2[total_column] = df2[total_column] * (-1)
         df2 = df2[[date_column, total_column]]
@@ -38,7 +39,7 @@ class ExtratoGUI:
         return df2
     
     def __getConcatDataframes(self, df1, df2):
-        date_column = self.__side_bar.extrato.extrato_columns._date_col.getName()
+        date_column = self.__columns_object._date_col.getName()
         df = pd.concat([df1, df2])
         df = df.rename(columns={date_column:'index'}).set_index('index')
         return df
