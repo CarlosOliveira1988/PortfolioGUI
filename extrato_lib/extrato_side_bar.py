@@ -1,50 +1,91 @@
+import pandas as pd
 import streamlit as st
 
+from extrato_lib.extrato_columns import ExtratoColumns
 from extrato_lib.extrato_dataframe import ExtratoDataframe
+
+
+class ExtratoFilter:
+    def __init__(self):
+        """Structure to apply filters based on Extrato objects."""
+        self.__extrato = ExtratoDataframe()
+        self.__columns_object = ExtratoColumns()
+        self.__updateDataframes()
+    
+    def __updateDataframes(self):
+        self.__filtered_df = self.__extrato.getNotNanDataframe()
+        self.__filtered_fmtdf = self.__extrato.getFormattedDataframe()
+    
+    def applyMarketFilter(self, market_list: list) -> None:
+        column = self.__columns_object._market_col.getName()
+        if market_list:
+            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column].isin(market_list)]
+            self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column].isin(market_list)]
+    
+    def applyTickerFilter(self, ticker: str) -> None:
+        column = self.__columns_object._ticker_col.getName()
+        if ticker != "Exibir todos":
+            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column] == ticker]
+            self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column] == ticker]
+    
+    def applyOperationFilter(self, operation: str) -> None:
+        column = self.__columns_object._operation_col.getName()
+        if operation != "Exibir todas":
+            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column] == operation]
+            self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column] == operation]
+    
+    def applyDateFilter(self, start_date: pd.Timestamp, end_date: pd.Timestamp) -> None:
+        column = self.__columns_object._date_col.getName()
+        if start_date and end_date:
+            self.__filtered_df = self.__filtered_df.loc[(start_date <= self.__filtered_df[column]) & (self.__filtered_df[column] <= end_date)]
+            self.__filtered_fmtdf = self.__filtered_fmtdf.loc[(start_date <= self.__filtered_fmtdf[column]) & (self.__filtered_fmtdf[column] <= end_date)]
+
+    def updateDataframe(self, file) -> None:
+        self.__extrato.readExcelFile(file)
+        self.__updateDataframes()
+
+    def getDataframe(self) -> pd.DataFrame:
+        return self.__filtered_df.copy()
+    
+    def getFormattedDataframe(self) -> pd.DataFrame:
+        return self.__filtered_fmtdf.copy()
 
 
 class ExtratoSideBar:
     def __init__(self):
         """Structure to draw an Extrato Filter's Side Bar."""
-        self.extrato = ExtratoDataframe()
-        self.__columns_object = self.extrato.getColumnsObject()
-        
-        # Dataframes for common usage
-        self.__filtered_df = self.extrato.getNotNanDataframe()
-        self.__filtered_fmtdf = self.extrato.getFormattedDataframe()
-        
-        # Dataframes ONLY for Date filtering
-        self.__filtered_date_df = self.extrato.getNotNanDataframe()
-        self.__filtered_date_fmtdf = self.extrato.getFormattedDataframe()
+        self.__columns_object = ExtratoColumns()
+        self.__date_filter = ExtratoFilter()
+        self.__any_filter = ExtratoFilter()
     
     def __showSubHearder(self) -> None:
         st.sidebar.subheader('Filtros')
     
     def __showMarketFilter(self) -> list:
         column = self.__columns_object._market_col.getName()
-        market_default_series = self.__filtered_df[column].drop_duplicates()
-        self.__market_list_filter = st.sidebar.multiselect('Mercado:', market_default_series.sort_values())
-        self.__applyMarketFilter()
+        market_default_series = self.__any_filter.getDataframe()[column].drop_duplicates()
+        market_list_filter = st.sidebar.multiselect('Mercado:', market_default_series.sort_values())
+        self.__any_filter.applyMarketFilter(market_list_filter)
 
     def __showTickerFilter(self) -> str:
         column = self.__columns_object._ticker_col.getName()
         ticker_default_list = ["Exibir todos"]
-        ticker_default_list.extend(self.__filtered_df[column].drop_duplicates().sort_values())
-        self.__ticker_option_str_filter = st.sidebar.selectbox('Ticker:', ticker_default_list)
-        self.__applyTickerFilter()
+        ticker_default_list.extend(self.__any_filter.getDataframe()[column].drop_duplicates().sort_values())
+        ticker_filter = st.sidebar.selectbox('Ticker:', ticker_default_list)
+        self.__any_filter.applyTickerFilter(ticker_filter)
 
     def __showOperationFilter(self) -> str:
         column = self.__columns_object._operation_col.getName()
         op_default_list = ["Exibir todas"]
-        op_default_list.extend(self.__filtered_df[column].drop_duplicates().sort_values())
-        self.__operation_option_str_filter = st.sidebar.selectbox('Operação:', op_default_list)
-        self.__applyOperationFilter()
+        op_default_list.extend(self.__any_filter.getDataframe()[column].drop_duplicates().sort_values())
+        operation_filter = st.sidebar.selectbox('Operação:', op_default_list)
+        self.__any_filter.applyOperationFilter(operation_filter)
     
     def __showDateFilter(self) -> tuple:
         column = self.__columns_object._date_col.getName()
-        start_date = self.__filtered_df[column].min()
-        end_date = self.__filtered_df[column].max()
-        if self.__filtered_df.empty:
+        start_date = self.__any_filter.getDataframe()[column].min()
+        end_date = self.__any_filter.getDataframe()[column].max()
+        if self.__any_filter.getDataframe().empty:
             date_option = st.sidebar.slider('Período:', disabled=True)
             init_date = None
             finish_date = None
@@ -56,8 +97,8 @@ class ExtratoSideBar:
             date_option = st.sidebar.slider('Período:', min_value=start_date, max_value=end_date, value=(start_date, end_date))
             init_date = date_option[0]
             finish_date = date_option[1]
-        self.__start_date, self.__end_date = init_date, finish_date
-        self.__applyDateFilter()
+        self.__any_filter.applyDateFilter(init_date, finish_date)
+        self.__date_filter.applyDateFilter(init_date, finish_date)
     
     def __showSideBar(self) -> None:
         self.__showSubHearder()
@@ -66,48 +107,19 @@ class ExtratoSideBar:
         self.__showOperationFilter()
         self.__showDateFilter()
     
-    def __applyMarketFilter(self) -> None:
-        column = self.__columns_object._market_col.getName()
-        if self.__market_list_filter:
-            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column].isin(self.__market_list_filter)]
-            self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column].isin(self.__market_list_filter)]
-    
-    def __applyTickerFilter(self) -> None:
-        column = self.__columns_object._ticker_col.getName()
-        if self.__ticker_option_str_filter != "Exibir todos":
-            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column] == self.__ticker_option_str_filter]
-            self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column] == self.__ticker_option_str_filter]
-    
-    def __applyOperationFilter(self) -> None:
-        column = self.__columns_object._operation_col.getName()
-        if self.__operation_option_str_filter != "Exibir todas":
-            self.__filtered_df = self.__filtered_df.loc[self.__filtered_df[column] == self.__operation_option_str_filter]
-            self.__filtered_fmtdf = self.__filtered_fmtdf.loc[self.__filtered_fmtdf[column] == self.__operation_option_str_filter]
-    
-    def __applyDateFilter(self) -> None:
-        column = self.__columns_object._date_col.getName()
-        if self.__start_date and self.__end_date:
-            self.__filtered_df = self.__filtered_df.loc[(self.__start_date <= self.__filtered_df[column]) & (self.__filtered_df[column] <= self.__end_date)]
-            self.__filtered_fmtdf = self.__filtered_fmtdf.loc[(self.__start_date <= self.__filtered_fmtdf[column]) & (self.__filtered_fmtdf[column] <= self.__end_date)]
-            self.__filtered_date_df = self.__filtered_date_df.loc[(self.__start_date <= self.__filtered_date_df[column]) & (self.__filtered_date_df[column] <= self.__end_date)]
-            self.__filtered_date_fmtdf = self.__filtered_date_fmtdf.loc[(self.__start_date <= self.__filtered_date_fmtdf[column]) & (self.__filtered_date_fmtdf[column] <= self.__end_date)]
-    
-    def updateDataframe(self, file):
-        self.extrato.readExcelFile(file)
-        self.__filtered_df = self.extrato.getNotNanDataframe()
-        self.__filtered_fmtdf = self.extrato.getFormattedDataframe()
-        self.__filtered_date_df = self.extrato.getNotNanDataframe()
-        self.__filtered_date_fmtdf = self.extrato.getFormattedDataframe()
+    def updateDataframe(self, file) -> None:
+        self.__date_filter.updateDataframe(file)
+        self.__any_filter.updateDataframe(file)
         self.__showSideBar()
     
-    def getFilteredDataframe(self):
-        return self.__filtered_df.copy()
+    def getFilteredDataframe(self) -> pd.DataFrame:
+        return self.__any_filter.getDataframe().copy()
     
-    def getFilteredFormattedDataframe(self):
-        return self.__filtered_fmtdf.copy()
+    def getFilteredFormattedDataframe(self) -> pd.DataFrame:
+        return self.__any_filter.getFormattedDataframe().copy()
 
-    def getDateFilteredDataframe(self):
-        return self.__filtered_date_df.copy()
+    def getDateFilteredDataframe(self) -> pd.DataFrame:
+        return self.__date_filter.getDataframe().copy()
     
-    def getDateFilteredFormattedDataframe(self):
-        return self.__filtered_date_fmtdf.copy()
+    def getDateFilteredFormattedDataframe(self) -> pd.DataFrame:
+        return self.__date_filter.getFormattedDataframe().copy()

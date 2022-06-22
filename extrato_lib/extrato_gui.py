@@ -1,25 +1,28 @@
 import pandas as pd
 import streamlit as st
 
+from extrato_lib.extrato_columns import ExtratoColumns
 from extrato_lib.extrato_side_bar import ExtratoSideBar
+from extrato_lib.extrato_dataframe import ExtratoDataframe
 
 
 class ExtratoGUI:
     def __init__(self):
         """Structure used to show tables and graphs related to Extrato."""
+        self.__extrato = ExtratoDataframe()
         self.__side_bar = ExtratoSideBar()
-        self.__columns_object = self.__side_bar.extrato.getColumnsObject()
+        self.__columns_object = ExtratoColumns()
         self.__filtered_fmtdf = self.__side_bar.getFilteredFormattedDataframe()
         self.__filtered_date_df = self.__side_bar.getDateFilteredDataframe()
 
-    def __showMainTitle(self):
+    def __showMainTitle(self) -> None:
         st.write('# Extrato')
         st.write('#### Histórico de transações')
     
-    def __showDataframe(self):
+    def __showDataframe(self) -> None:
         st.write("", self.__filtered_fmtdf.astype(str))
 
-    def __getPositiveDataframe(self, op_string):
+    def __getPositiveDataframe(self, op_string: str) -> pd.DataFrame:
         op_column = self.__columns_object._operation_col.getName()
         total_column = self.__columns_object._total_price_col.getName()
         date_column = self.__columns_object._date_col.getName()
@@ -28,7 +31,7 @@ class ExtratoGUI:
         df1 = df1.rename(columns={total_column: op_string})
         return df1
 
-    def __getNegativeDataframe(self, op_string):
+    def __getNegativeDataframe(self, op_string: str) -> pd.DataFrame:
         op_column = self.__columns_object._operation_col.getName()
         total_column = self.__columns_object._total_price_col.getName()
         date_column = self.__columns_object._date_col.getName()
@@ -38,24 +41,24 @@ class ExtratoGUI:
         df2 = df2.rename(columns={total_column: op_string})
         return df2
     
-    def __getConcatDataframes(self, df1, df2):
+    def __getConcatDataframes(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
         date_column = self.__columns_object._date_col.getName()
         df = pd.concat([df1, df2])
         df = df.rename(columns={date_column:'index'}).set_index('index')
         return df
 
-    def __getStatistics(self, df, col1, col2):
+    def __getStatistics(self, df: pd.DataFrame, col1: str, col2: str) -> tuple:
         list1 = [df[col1].sum(), df[col1].count()]
         list2 = [df[col2].sum() * -1, df[col2].count()]
         delta = [list1[0] - list2[0], list1[1] - list2[1]]
         return list1, list2, delta
     
-    def __formatStatistics(self, lists):
+    def __formatStatistics(self, lists: list) -> None:
         for statistic_list in lists:
-            statistic_list[0] = self.__side_bar.extrato._getMoneyString(statistic_list[0])
+            statistic_list[0] = self.__extrato._getMoneyString(statistic_list[0])
             statistic_list[1] = '[' + str(statistic_list[1]) + ']'
 
-    def __showAccountBarChart(self):
+    def __showAccountBarChart(self) -> None:
         df1 = self.__getPositiveDataframe("Transferência")
         df2 = self.__getNegativeDataframe("Resgate")
         df = self.__getConcatDataframes(df1, df2)
@@ -72,7 +75,7 @@ class ExtratoGUI:
             Esses valores são representados na coluna 'Operação' como 'Transferência' e 'Resgate'.
         """)
 
-    def __showAssetsBarChart(self):
+    def __showAssetsBarChart(self) -> None:
         df1 = self.__getPositiveDataframe("Venda")
         df2 = self.__getNegativeDataframe("Compra")
         df = self.__getConcatDataframes(df1, df2)
@@ -89,7 +92,7 @@ class ExtratoGUI:
             Esses valores são representados na coluna 'Operação' como 'Compra' e 'Venda'.
         """)
 
-    def setDataframe(self, file):
+    def setDataframe(self, file) -> None:
         self.__side_bar.updateDataframe(file)
         self.__filtered_fmtdf = self.__side_bar.getFilteredFormattedDataframe()
         self.__filtered_date_df = self.__side_bar.getDateFilteredDataframe()
