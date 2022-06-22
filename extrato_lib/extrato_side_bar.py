@@ -6,7 +6,7 @@ from extrato_lib.extrato_filter import ExtratoFilter
 
 
 class ExtratoSideBar:
-    def __init__(self):
+    def __init__(self) -> None:
         """Structure to draw an Extrato Filter's Side Bar."""
         self.__columns_object = ExtratoColumns()
         self.__date_filter = ExtratoFilter()

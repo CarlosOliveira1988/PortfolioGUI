@@ -1,8 +1,8 @@
-from common_lib.columns_group import ColumnsInterface
+from common_lib.columns_group import MustHaveColumns
 
 
-class OpenedPositionColumns(ColumnsInterface):
-    def __init__(self):
+class OpenedPositionColumns(MustHaveColumns):
+    def __init__(self) -> None:
         """Structure to define all the Opened Position columns.
         
         Those columns are created while finding the Opened Positions from the Extrato.
@@ -10,8 +10,6 @@ class OpenedPositionColumns(ColumnsInterface):
         super().__init__()
         
         # Data for Ticker classification
-        self._market_col = self.addRawColumn("Mercado", "string")
-        self._ticker_col = self.addRawColumn("Ticker", "string")
         self._indexer_col = self.addRawColumn("Indexador", "string")
         
         # Yield columns for Fixed Income, Treasury Bonds and Stocks (dividend-yield)

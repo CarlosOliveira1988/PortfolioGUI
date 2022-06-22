@@ -7,7 +7,7 @@ from common_lib.columns_group import ColumnsInterface
 
 
 class DataframeInterface:
-    def __init__(self, columns_object: ColumnsInterface):
+    def __init__(self, columns_object: ColumnsInterface) -> None:
         """Structure to handle different types of dataframes.
         
         The main output of this class are:

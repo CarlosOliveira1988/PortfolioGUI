@@ -7,7 +7,7 @@ from extrato_lib.extrato_dataframe import ExtratoDataframe
 
 
 class ExtratoGUI:
-    def __init__(self):
+    def __init__(self) -> None:
         """Structure used to show tables and graphs related to Extrato."""
         self.__extrato = ExtratoDataframe()
         self.__side_bar = ExtratoSideBar()

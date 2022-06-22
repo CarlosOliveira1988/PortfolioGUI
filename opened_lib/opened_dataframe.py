@@ -3,7 +3,7 @@ from common_lib.dataframe_group import DataframeInterface
 
 
 class OpenedPositionDataframe(DataframeInterface):
-    def __init__(self):
+    def __init__(self) -> None:
         """Structure to handle a special Pandas dataframe related to Portfolio.
         
         Only the Opened Positions are handled with this class.

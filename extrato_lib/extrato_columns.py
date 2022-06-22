@@ -1,8 +1,8 @@
-from common_lib.columns_group import ColumnsInterface
+from common_lib.columns_group import MustHaveColumns
 
 
-class ExtratoColumns(ColumnsInterface):
-    def __init__(self):
+class ExtratoColumns(MustHaveColumns):
+    def __init__(self) -> None:
         """Structure to define all the Extrato columns.
         
         All the defined columns must be present in the Extrato Spreadsheet.
@@ -10,8 +10,6 @@ class ExtratoColumns(ColumnsInterface):
         super().__init__()
         
         # Columns for Ticker classification
-        self._market_col = self.addRawColumn("Mercado", "string")
-        self._ticker_col = self.addRawColumn("Ticker", "string")
         self._operation_col = self.addRawColumn("Operação", "string")
         
         # Date of the spreadsheet entries

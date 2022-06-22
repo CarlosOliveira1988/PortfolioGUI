@@ -1,7 +1,7 @@
 from common_lib.raw_column import RawColumn
 
 class ColumnsInterface:
-    def __init__(self):
+    def __init__(self) -> None:
         """Structure to define a group of columns to make easier handling Pandas dataframes.
         
         It is useful to help while formatting and applying NaN values in its cells.
@@ -56,3 +56,13 @@ class ColumnsInterface:
     
     def isPercentageType(self, column_type: str) -> bool:
         return column_type == "%"
+
+
+class MustHaveColumns(ColumnsInterface):
+    def __init__(self) -> None:
+        """Structure to define some important columns present in most of the structures."""
+        super().__init__()
+        
+        # Columns for Ticker classification
+        self._market_col = self.addRawColumn("Mercado", "string")
+        self._ticker_col = self.addRawColumn("Ticker", "string")

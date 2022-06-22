@@ -1,5 +1,5 @@
 class RawColumn:
-    def __init__(self, column_name: str, column_type: str):
+    def __init__(self, column_name: str, column_type: str) -> None:
         """Structure to define some column parameters.
 
         Args:
