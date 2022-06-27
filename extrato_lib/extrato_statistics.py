@@ -4,9 +4,19 @@ from extrato_lib.extrato_columns import ExtratoColumns
 from extrato_lib.extrato_dataframe import ExtratoDataframe
 
 
-class ExtratoStatistics:
+class OperationTotalPriceStatistics:
     def __init__(self, pos_operation: str, neg_operation: str) -> None:
-        """Structure used to calculate statistics related to Extrato."""
+        """Structure used to calculate statistics related to Extrato.
+        
+        This class uses the following columns to extract useful data:
+        - 'Data'
+        - 'Operação'
+        - 'Preço Unitário'
+        
+        Args:
+        - pos_operation (str): column defined as 'positive values'
+        - neg_operation (str): column defined as 'negative values'
+        """
         self.__pos_operation = pos_operation
         self.__neg_operation = neg_operation
         self.__positive_list = [None, None]

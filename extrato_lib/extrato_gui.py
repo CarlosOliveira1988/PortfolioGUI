@@ -1,7 +1,29 @@
+import pandas as pd
 import streamlit as st
 
 from extrato_lib.extrato_side_bar import ExtratoSideBar
-from extrato_lib.extrato_statistics import ExtratoStatistics
+from extrato_lib.extrato_statistics import OperationTotalPriceStatistics
+from extrato_lib.extrato_dataframe import ExtratoDataframe
+
+
+class ExtratoTableInfo:
+    def __init__(self) -> None:
+        """Structure used to show an interactive table related to the 'Extrato'."""
+        self.__filtered_fmtdf = ExtratoDataframe().getFormattedDataframe()
+
+    def __showMainTitle(self) -> None:
+        st.write('# Extrato')
+        st.write('#### Histórico de transações')
+    
+    def __showDataframe(self) -> None:
+        st.write("", self.__filtered_fmtdf.astype(str))
+
+    def setDataframe(self, dataframe: pd.DataFrame):
+        self.__filtered_fmtdf = dataframe
+    
+    def showInfo(self):
+        self.__showMainTitle()
+        self.__showDataframe()
 
 
 class ExtratoAccountInfo:
@@ -13,7 +35,7 @@ class ExtratoAccountInfo:
         - 'Operação::Transferência' are positive values (put money in the account)
         - 'Operação::Resgate' are negative values (take money from the account)
         """
-        self.__account_statistics = ExtratoStatistics("Transferência", "Resgate")
+        self.__account_statistics = OperationTotalPriceStatistics("Transferência", "Resgate")
 
     def setDataframe(self, dataframe):
         self.__account_statistics.setDataframe(dataframe)
@@ -40,7 +62,7 @@ class ExtratoAssetsInfo:
         - 'Operação::Venda' are positive values (put money in the account)
         - 'Operação::Compra' are negative values (take money from the account)
         """
-        self.__assets_statistics = ExtratoStatistics("Venda", "Compra")
+        self.__assets_statistics = OperationTotalPriceStatistics("Venda", "Compra")
         
     def setDataframe(self, dataframe):
         self.__assets_statistics.setDataframe(dataframe)
@@ -62,32 +84,19 @@ class ExtratoGUI:
     def __init__(self) -> None:
         """Structure used to show tables and graphs related to Extrato."""
         self.__side_bar = ExtratoSideBar()
+        self.__table = ExtratoTableInfo()
         self.__account_info = ExtratoAccountInfo()
         self.__assets_info = ExtratoAssetsInfo()
         self.__setDataframes()
 
-    def __setDataframes(self):
-        self.__filtered_fmtdf = self.__side_bar.getFilteredFormattedDataframe()
+    def __setDataframes(self) -> None:
+        self.__table.setDataframe(self.__side_bar.getFilteredFormattedDataframe())
         self.__account_info.setDataframe(self.__side_bar.getDateFilteredDataframe())
         self.__assets_info.setDataframe(self.__side_bar.getDateFilteredDataframe())
-
-    def __showMainTitle(self) -> None:
-        st.write('# Extrato')
-        st.write('#### Histórico de transações')
-    
-    def __showDataframe(self) -> None:
-        st.write("", self.__filtered_fmtdf.astype(str))
-
-    def __showAccountsInfo(self):
-        self.__account_info.showInfo()
-
-    def __showAssetsInfo(self) -> None:
-        self.__assets_info.showInfo()
 
     def setDataframe(self, file) -> None:
         self.__side_bar.updateDataframe(file)
         self.__setDataframes()
-        self.__showMainTitle()
-        self.__showDataframe()
-        self.__showAccountsInfo()
-        self.__showAssetsInfo()
+        self.__table.showInfo()
+        self.__account_info.showInfo()
+        self.__assets_info.showInfo()
