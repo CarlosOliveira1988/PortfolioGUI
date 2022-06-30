@@ -42,8 +42,8 @@ class ExtratoDataframe(DataframeInterface):
     def _calculateColumnsIfNotExists(self):
         """Method Inherited from 'DataframeInterface' class.
         
-        Perform calculation with some specific columns. Check the context related 
-        to the method in its class to understand its usage.
+        Perform calculation with some specific columns, in case the User forgets to put those columns in his file.
+        Please, check the context related to this method in its class to understand better its usage.
         """
         self.__setTotalPriceColumn()
         self.__setTotalCostsColumn()
