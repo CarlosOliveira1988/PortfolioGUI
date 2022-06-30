@@ -7,10 +7,11 @@ class ExtratoDataframe(DataframeInterface):
         """Structure to handle a Pandas dataframe based on Extrato spreadsheet."""
         self._columns_object = ExtratoColumns()
         super().__init__(self._columns_object)
-        self.calculateColumnsIfNotExists()
+        self._calculateColumnsIfNotExists()
 
     def __setTotalPriceColumn(self):
         # If the column is not present in the User data, add values to the created column
+        # 'Total Price' = 'Quantity' * 'Unit Price'
         if not self._columns_object._total_price_col.getUserDataState():
             self.multiplyTwoColumns(
                 self._columns_object._quantity_col.getName(), 
@@ -20,6 +21,7 @@ class ExtratoDataframe(DataframeInterface):
 
     def __setTotalCostsColumn(self):
         # If the column is not present in the User data, add values to the created column
+        # 'Total Costs' = 'IR' + 'Taxes'
         if not self._columns_object._total_costs_col.getUserDataState():
             self.sumTwoColumns(
                 self._columns_object._IR_col.getName(), 
@@ -29,6 +31,7 @@ class ExtratoDataframe(DataframeInterface):
 
     def __setTotalEarningsColumn(self):
         # If the column is not present in the User data, add values to the created column
+        # 'Total Earns' = 'Dividends' + 'JCP'
         if not self._columns_object._total_earnings_col.getUserDataState():
             self.sumTwoColumns(
                 self._columns_object._dividends_col.getName(),
@@ -36,10 +39,11 @@ class ExtratoDataframe(DataframeInterface):
                 self._columns_object._total_earnings_col.getName()
             )
 
-    def calculateColumnsIfNotExists(self):
-        """Method Inherited: perform calculation with some specific columns.
+    def _calculateColumnsIfNotExists(self):
+        """Method Inherited from 'DataframeInterface' class.
         
-        Check the context related to the method in its class to understand its usage.
+        Perform calculation with some specific columns. Check the context related 
+        to the method in its class to understand its usage.
         """
         self.__setTotalPriceColumn()
         self.__setTotalCostsColumn()

@@ -92,7 +92,7 @@ class DataframeInterface:
                 raw_column_obj.setAsUserData(True)
         return dataframe
     
-    def calculateColumnsIfNotExists(self):
+    def _calculateColumnsIfNotExists(self):
         """Abstract method to perform any calculation with non-exists dataframe columns."""
         pass
     
@@ -100,7 +100,7 @@ class DataframeInterface:
         file_dataframe = pd.read_excel(file)
         file_dataframe = self.__addColumnsIfNotExists(file_dataframe)
         self.__raw_df = self.__getRawDataframe(file_dataframe)
-        self.calculateColumnsIfNotExists()
+        self._calculateColumnsIfNotExists()
         self.__formatDataframes()
 
     def getRawDataframe(self) -> pd.DataFrame:
