@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 
 from extrato_lib.extrato_side_bar import ExtratoSideBar
-from extrato_lib.extrato_statistics import OperationTotalPriceStatistics, MarketEarnsCostsStatistics
+from extrato_lib.extrato_statistics import OperationTotalPriceStatistics, EarnsCostsStatistics
 from extrato_lib.extrato_dataframe import ExtratoDataframe
 
 
@@ -89,7 +89,7 @@ class ExtratoEarnsCostsInfo:
         - 'Proventos Totais' are positive values (put money in the account)
         - 'Custo Total' are negative values (take money from the account)
         """
-        self.__statistics = MarketEarnsCostsStatistics()
+        self.__statistics = EarnsCostsStatistics()
         
     def setDataframe(self, dataframe):
         self.__statistics.setDataframe(dataframe)

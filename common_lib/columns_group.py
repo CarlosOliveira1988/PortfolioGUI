@@ -1,5 +1,6 @@
 from common_lib.raw_column import RawColumn
 
+
 class ColumnsInterface:
     def __init__(self) -> None:
         """Structure to define a group of columns to make easier handling Pandas dataframes.

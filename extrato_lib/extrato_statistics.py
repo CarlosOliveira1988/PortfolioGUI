@@ -151,7 +151,7 @@ class OperationTotalPriceStatistics(StatisticsInterface):
         return self._getConcatDataframes(df1, df2)
 
 
-class MarketEarnsCostsStatistics(StatisticsInterface):
+class EarnsCostsStatistics(StatisticsInterface):
     def __init__(self) -> None:
         """Structure used to calculate statistics related to Extrato.
         
