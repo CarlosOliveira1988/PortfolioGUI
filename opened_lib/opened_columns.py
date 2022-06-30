@@ -1,7 +1,7 @@
-from common_lib.columns_group import MustHaveColumns
+from common_lib.columns_group import ColumnsInterface
 
 
-class OpenedPositionColumns(MustHaveColumns):
+class OpenedPositionColumns(ColumnsInterface):
     def __init__(self) -> None:
         """Structure to define all the Opened Position columns.
         

@@ -1,11 +1,11 @@
 import pandas as pd
 
-from common_lib.columns_group import MustHaveColumns
+from common_lib.columns_group import ColumnsInterface
 from common_lib.dataframe_group import DataframeInterface
 
 
 class FilterInterface:
-    def __init__(self, df_interface_object: DataframeInterface, columns_object: MustHaveColumns) -> None:
+    def __init__(self, df_interface_object: DataframeInterface, columns_object: ColumnsInterface) -> None:
         """Structure to apply filters to different types of DataframeInterface objects.
                 
         The main output of this class are:
@@ -14,7 +14,7 @@ class FilterInterface:
         
         Args:
         - df_interface_object: an instance based on 'DataframeInterface' class
-        - columns_object: an instance based on 'MustHaveColumns' class
+        - columns_object: an instance based on 'ColumnsInterface' class
         """
         self.__df_interface_object = df_interface_object
         self.__columns_object = columns_object
