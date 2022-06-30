@@ -5,7 +5,7 @@ from extrato_lib.extrato_dataframe import ExtratoDataframe
 
 
 class StatisticsCell:
-    def __init__(self):
+    def __init__(self) -> None:
         """Structure useful to calculate basic statistics in any dataframe.
         
         The main outputs are:
@@ -19,36 +19,36 @@ class StatisticsCell:
         self.__diff_sum = 0
         self.__diff_count = 0
     
-    def __updateDiffVariables(self):
+    def __updateDiffVariables(self) -> None:
         self.__diff_sum = self.__sum_a - self.__sum_b
         self.__diff_count = self.__count_a - self.__count_b
     
-    def setPositiveValues(self, df: pd.DataFrame, pos_operation: str):
+    def setPositiveValues(self, df: pd.DataFrame, pos_operation: str) -> None:
         self.__sum_a = df[pos_operation].sum()
-        self.__count_a = df[pos_operation].count()
+        self.__count_a = df[pos_operation].loc[df[pos_operation] != 0.0].count()
         self.__updateDiffVariables()
     
-    def setNegativeValues(self, df: pd.DataFrame, neg_operation: str):
+    def setNegativeValues(self, df: pd.DataFrame, neg_operation: str) -> None:
         self.__sum_b = df[neg_operation].sum() * (-1)
-        self.__count_b = df[neg_operation].count()
+        self.__count_b = df[neg_operation].loc[df[neg_operation] != 0.0].count()
         self.__updateDiffVariables()
     
-    def getPositiveSum(self):
+    def getPositiveSum(self) -> float:
         return self.__sum_a
     
-    def getPositiveCount(self):
+    def getPositiveCount(self) -> int:
         return self.__count_a
     
-    def getNegativeSum(self):
+    def getNegativeSum(self) -> float:
         return self.__sum_b
     
-    def getNegativeCount(self):
+    def getNegativeCount(self) -> int:
         return self.__count_b
     
-    def getDeltaSum(self):
+    def getDeltaSum(self) -> float:
         return self.__diff_sum
 
-    def getDeltaCount(self):
+    def getDeltaCount(self) -> int:
         return self.__diff_count
 
 
@@ -59,24 +59,52 @@ class StatisticsInterface:
         self.__neg_operation = neg_operation
         self.__extrato = ExtratoDataframe()
         self.__statistics = StatisticsCell()
-    
+
     def __getFormattedString(self, sum_value: float, count_value: int) -> str:
         str_a = self.__extrato._getMoneyString(sum_value)
         str_b = ' [' + str(count_value) + ']'
         return str_a + str_b
+
+    def __runStatistics(self) -> None:
+        self._output_dataframe = self._getResultDataframe()
+        self.setStatisticsDataframe(self._output_dataframe)
+
+    def _initDataframes(self) -> None:
+        self._input_dataframe = ExtratoDataframe().getNotNanDataframe()
+        self._output_dataframe = self._getResultDataframe()
     
+    def _getConcatDataframes(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
+        # Basically, return a 3 columns dataframe: 'Date', 'Price+' and 'Price-'
+        df = pd.concat([df1, df2])
+        return self._setDateColumnAsIndex(df)
+    
+    def _setDateColumnAsIndex(self, df):
+        columns_object = ExtratoColumns()
+        self.__date_column = columns_object._date_col.getName()
+        return df.rename(columns={self.__date_column:'index'}).set_index('index')
+    
+    def _getResultDataframe(self) -> pd.DataFrame:
+        return self._input_dataframe.copy()
+
     def setStatisticsDataframe(self, df: pd.DataFrame) -> tuple:
         self.__statistics.setPositiveValues(df, self.__pos_operation)
         self.__statistics.setNegativeValues(df, self.__neg_operation)
 
-    def getPositiveOperationString(self):
+    def getPositiveOperationString(self) -> str:
         return self.__getFormattedString(self.__statistics.getPositiveSum(), self.__statistics.getPositiveCount())
     
-    def getNegativeOperationString(self):
+    def getNegativeOperationString(self) -> str:
         return self.__getFormattedString(self.__statistics.getNegativeSum(),self.__statistics.getNegativeCount())
     
-    def getDeltaOperationString(self):
+    def getDeltaOperationString(self) -> str:
         return self.__getFormattedString(self.__statistics.getDeltaSum(), self.__statistics.getDeltaCount())
+
+    def setDataframe(self, dataframe) -> None:
+        self._input_dataframe = dataframe
+        self.__runStatistics()
+
+    def getResultDataframe(self) -> pd.DataFrame:
+        return self._output_dataframe.copy()
 
 
 class OperationTotalPriceStatistics(StatisticsInterface):
@@ -86,33 +114,29 @@ class OperationTotalPriceStatistics(StatisticsInterface):
         This class uses the following columns to extract useful data:
         - 'Data'
         - 'Operação'
-        - 'Preço Unitário'
+        - 'Preço Total'
         
         Args:
         - pos_operation (str): column defined as 'positive values' (Example: 'Venda')
         - neg_operation (str): column defined as 'negative values' (Example: 'Compra')
         """
         super().__init__(pos_operation, neg_operation)
-        self.__initColumnVariables(pos_operation, neg_operation)
-        self.__initDataframes()
+        self._initColumnVariables(pos_operation, neg_operation)
+        self._initDataframes()
 
-    def __initColumnVariables(self, pos_operation, neg_operation):
+    def _initColumnVariables(self, pos_operation: str, neg_operation: str) -> None:
         columns_object = ExtratoColumns()
+        self.__date_column = columns_object._date_col.getName()
         self.__op_column = columns_object._operation_col.getName()
         self.__total_column = columns_object._total_price_col.getName()
-        self.__date_column = columns_object._date_col.getName()
         self.__pos_operation = pos_operation
         self.__neg_operation = neg_operation
-
-    def __initDataframes(self):
-        self.__input_dataframe = ExtratoDataframe().getNotNanDataframe()
-        self.__output_dataframe = self.__getResultDataframe()
 
     def __getOperationsDataframe(self, op_string: str, negative_flag=False) -> pd.DataFrame:
         # Basically, return a 2 columns dataframe, in 2 different situations:
         # - 'Date' and 'Price+'; or
         # - 'Date' and 'Price-'
-        target_dataframe = self.__input_dataframe.copy()
+        target_dataframe = self._input_dataframe.copy()
         df = target_dataframe.loc[target_dataframe[self.__op_column] == op_string]
         if negative_flag:
             df[self.__total_column] = df[self.__total_column] * (-1)
@@ -120,25 +144,37 @@ class OperationTotalPriceStatistics(StatisticsInterface):
         df = df.rename(columns={self.__total_column: op_string})
         return df
     
-    def __getConcatDataframes(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
-        # Basically, return a 3 columns dataframe: 'Date', 'Price+' and 'Price-'
-        df = pd.concat([df1, df2])
-        df = df.rename(columns={self.__date_column:'index'}).set_index('index')
-        return df
-    
-    def __getResultDataframe(self):
+    def _getResultDataframe(self) -> pd.DataFrame:
         # Basically, return a 3 columns dataframe: 'Date', 'Price+' and 'Price-'
         df1 = self.__getOperationsDataframe(self.__pos_operation)
         df2 = self.__getOperationsDataframe(self.__neg_operation, negative_flag=True)
-        return self.__getConcatDataframes(df1, df2)
+        return self._getConcatDataframes(df1, df2)
+
+
+class MarketEarnsCostsStatistics(StatisticsInterface):
+    def __init__(self) -> None:
+        """Structure used to calculate statistics related to Extrato.
+        
+        This class uses the following columns to extract useful data:
+        - 'Data'
+        - 'Proventos Totais' (positive values)
+        - 'Custo Total' (negative values)
+        """
+        self._initColumnVariables()
+        super().__init__(self.__pos_operation, self.__neg_operation)
+        self._initDataframes()
     
-    def __runStatistics(self) -> None:
-        self.__output_dataframe = self.__getResultDataframe()
-        self.setStatisticsDataframe(self.__output_dataframe)
-    
-    def setDataframe(self, dataframe):
-        self.__input_dataframe = dataframe
-        self.__runStatistics()
-    
-    def getResultDataframe(self):
-        return self.__output_dataframe.copy()
+    def _initColumnVariables(self):
+        columns_object = ExtratoColumns()
+        self.__date_column = columns_object._date_col.getName()
+        self.__total_earnings_column = columns_object._total_earnings_col .getName()
+        self.__total_costs_column = columns_object._total_costs_col.getName()
+        self.__pos_operation = self.__total_earnings_column
+        self.__neg_operation = self.__total_costs_column
+
+    def _getResultDataframe(self) -> pd.DataFrame:
+        # Basically, return a 3 columns dataframe: 'Date', 'Price+' and 'Price-'
+        target_dataframe = self._input_dataframe.copy()
+        df = target_dataframe[[self.__date_column, self.__total_earnings_column, self.__total_costs_column]]
+        df[self.__total_costs_column] = df[self.__total_costs_column] * (-1)
+        return self._setDateColumnAsIndex(df)
