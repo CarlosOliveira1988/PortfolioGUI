@@ -1,4 +1,4 @@
-from common_lib.columns_group import ColumnsInterface
+from common_lib.columns import ColumnsInterface
 
 
 class OpenedPositionColumns(ColumnsInterface):

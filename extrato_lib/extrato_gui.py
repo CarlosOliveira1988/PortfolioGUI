@@ -3,7 +3,7 @@ import streamlit as st
 
 from extrato_lib.extrato_side_bar import ExtratoSideBar
 from extrato_lib.extrato_statistics import OperationTotalPriceStatistics, EarnsCostsStatistics
-from extrato_lib.extrato_dataframe import ExtratoDataframe
+from extrato_lib.extrato_dataframes_kit import ExtratoDataframe
 
 
 class ExtratoTableInfo:

@@ -1,5 +1,5 @@
 from extrato_lib.extrato_columns import ExtratoColumns
-from common_lib.dataframe_group import DataframeInterface
+from common_lib.dataframes_kit import DataframeInterface
 
 
 class ExtratoDataframe(DataframeInterface):

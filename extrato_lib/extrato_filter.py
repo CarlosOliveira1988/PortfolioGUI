@@ -1,8 +1,8 @@
 import pandas as pd
 
 from extrato_lib.extrato_columns import ExtratoColumns
-from extrato_lib.extrato_dataframe import ExtratoDataframe
-from common_lib.filter_group import FilterInterface
+from extrato_lib.extrato_dataframes_kit import ExtratoDataframe
+from common_lib.filter import FilterInterface
 
 
 class ExtratoFilter(FilterInterface):

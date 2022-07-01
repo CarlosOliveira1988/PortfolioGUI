@@ -3,7 +3,7 @@ import locale
 import pandas as pd
 import numpy as np
 
-from common_lib.columns_group import ColumnsInterface
+from common_lib.columns import ColumnsInterface
 
 
 class DataframeInterface:

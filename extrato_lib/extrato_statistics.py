@@ -1,7 +1,7 @@
 import pandas as pd
 
 from extrato_lib.extrato_columns import ExtratoColumns
-from extrato_lib.extrato_dataframe import ExtratoDataframe
+from extrato_lib.extrato_dataframes_kit import ExtratoDataframe
 
 
 class StatisticsCell:

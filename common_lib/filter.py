@@ -1,7 +1,7 @@
 import pandas as pd
 
-from common_lib.columns_group import ColumnsInterface
-from common_lib.dataframe_group import DataframeInterface
+from common_lib.columns import ColumnsInterface
+from common_lib.dataframes_kit import DataframeInterface
 
 
 class FilterInterface:

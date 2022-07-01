@@ -1,5 +1,5 @@
 from opened_lib.opened_columns import OpenedPositionColumns
-from common_lib.dataframe_group import DataframeInterface
+from common_lib.dataframes_kit import DataframeInterface
 
 
 class OpenedPositionDataframe(DataframeInterface):
