@@ -1,19 +1,19 @@
 import pandas as pd
 
 from common_lib.columns import ColumnsInterface
-from common_lib.dataframes_kit import DataframeInterface
+from common_lib.dataframes_kit import DataframesKitInterface
 
 
 class FilterInterface:
-    def __init__(self, df_interface_object: DataframeInterface, columns_object: ColumnsInterface) -> None:
-        """Structure to apply filters to different types of DataframeInterface objects.
+    def __init__(self, df_interface_object: DataframesKitInterface, columns_object: ColumnsInterface) -> None:
+        """Structure to apply filters to different types of DataframesKitInterface objects.
                 
         The main output of this class are:
         - filtered dataframe
         - filtered formatted dataframe
         
         Args:
-        - df_interface_object: an instance based on 'DataframeInterface' class
+        - df_interface_object: an instance based on 'DataframesKitInterface' class
         - columns_object: an instance based on 'ColumnsInterface' class
         """
         self.__df_interface_object = df_interface_object

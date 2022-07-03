@@ -1,7 +1,7 @@
 import pandas as pd
 
-from extrato_lib.extrato_columns import ExtratoColumns
-from extrato_lib.extrato_dataframes_kit import ExtratoDataframe
+from extrato_lib.extrato_columns import ExtratoDBColumns
+from extrato_lib.extrato_dataframes_kit import ExtratoDBKit
 
 
 class StatisticsCell:
@@ -57,7 +57,7 @@ class StatisticsInterface:
         """Structure useful to format some statistics in any dataframe."""
         self.__pos_operation = pos_operation
         self.__neg_operation = neg_operation
-        self.__extrato = ExtratoDataframe()
+        self.__extrato = ExtratoDBKit()
         self.__statistics = StatisticsCell()
 
     def __getFormattedString(self, sum_value: float, count_value: int) -> str:
@@ -70,7 +70,7 @@ class StatisticsInterface:
         self.setStatisticsDataframe(self._output_dataframe)
 
     def _initDataframes(self) -> None:
-        self._input_dataframe = ExtratoDataframe().getNotNanDataframe()
+        self._input_dataframe = ExtratoDBKit().getNotNanDataframe()
         self._output_dataframe = self._getResultDataframe()
     
     def _getConcatDataframes(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
@@ -79,7 +79,7 @@ class StatisticsInterface:
         return self._setDateColumnAsIndex(df)
     
     def _setDateColumnAsIndex(self, df):
-        columns_object = ExtratoColumns()
+        columns_object = ExtratoDBColumns()
         self.__date_column = columns_object._date_col.getName()
         return df.rename(columns={self.__date_column:'index'}).set_index('index')
     
@@ -125,7 +125,7 @@ class OperationTotalPriceStatistics(StatisticsInterface):
         self._initDataframes()
 
     def _initColumnVariables(self, pos_operation: str, neg_operation: str) -> None:
-        columns_object = ExtratoColumns()
+        columns_object = ExtratoDBColumns()
         self.__date_column = columns_object._date_col.getName()
         self.__op_column = columns_object._operation_col.getName()
         self.__total_column = columns_object._total_price_col.getName()
@@ -165,7 +165,7 @@ class EarnsCostsStatistics(StatisticsInterface):
         self._initDataframes()
     
     def _initColumnVariables(self):
-        columns_object = ExtratoColumns()
+        columns_object = ExtratoDBColumns()
         self.__date_column = columns_object._date_col.getName()
         self.__total_earnings_column = columns_object._total_earnings_col .getName()
         self.__total_costs_column = columns_object._total_costs_col.getName()

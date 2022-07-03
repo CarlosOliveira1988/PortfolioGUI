@@ -6,7 +6,7 @@ import numpy as np
 from common_lib.columns import ColumnsInterface
 
 
-class DataframeInterface:
+class DataframesKitInterface:
     def __init__(self, columns_object: ColumnsInterface) -> None:
         """Structure to handle different types of dataframes.
         
@@ -16,7 +16,7 @@ class DataframeInterface:
         - nan dataframe
         
         Args:
-        - columns_object: an instance based on 'ColumnsInterface' class
+        - columns_object: any instance based on 'ColumnsInterface' class
         """
         locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
         self._columns_object = columns_object
