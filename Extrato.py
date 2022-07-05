@@ -21,7 +21,7 @@ class ExtratoGUI:
         clicked = st.button("Carregar planilha")
         if clicked:
             self.__openFile()
-        st.write('Arquivo: ', st.session_state.extrato_file)
+        st.write('Planilha atual: ', st.session_state.extrato_file)
 
     def __showInfo(self) -> None:
         self.__showMainTitle()
@@ -38,10 +38,14 @@ class ExtratoGUI:
         file_manager = FileManager()
         st.session_state.extrato_file = file_manager.getExtratoFile()
         st.markdown(
-            """Por limitações do Streamlit, ainda não resolvidas, por favor encerre
-            e reinicie novamente a aplicação para que o novo arquivo seja carregado.
+            """
+            :disappointed_relieved: Por limitações do Streamlit, ainda não resolvidas...
+            
+            :sweat_smile: **Por favor, reinicie a aplicação para carregar o novo arquivo!**
+            É necessário fechar a página e também o prompt de comandos.
             """
         )
+        st.stop()
 
 
 file_manager = FileManager()
