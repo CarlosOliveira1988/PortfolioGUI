@@ -1,5 +1,7 @@
 import pandas as pd
 
+from common_lib.dataframes_kit import SingleFormatter
+
 from extrato_lib.extrato_columns import ExtratoDBColumns
 from extrato_lib.extrato_dataframes_kit import ExtratoDBKit
 
@@ -57,11 +59,11 @@ class StatisticsInterface:
         """Structure useful to format some statistics in any dataframe."""
         self.__pos_operation = pos_operation
         self.__neg_operation = neg_operation
-        self.__extrato = ExtratoDBKit()
+        self.__formatter = SingleFormatter()
         self.__statistics = StatisticsCell()
 
     def __getFormattedString(self, sum_value: float, count_value: int) -> str:
-        str_a = self.__extrato._getMoneyString(sum_value)
+        str_a = self.__formatter.getMoneyString(sum_value)
         str_b = ' [' + str(count_value) + ']'
         return str_a + str_b
 
