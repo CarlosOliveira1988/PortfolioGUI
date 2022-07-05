@@ -115,10 +115,23 @@ class DataframesKitInterface:
     def getColumnsObject(self) -> ColumnsInterface:
         return self._columns_object
     
-    def sumTwoColumns(self, col_A: str, col_B: str, result_col: str):
+    def sumTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
         self.__raw_df[result_col] = self.__raw_df[col_A] + self.__raw_df[col_B]
         self.__formatDataframes()
     
-    def multiplyTwoColumns(self, col_A: str, col_B: str, result_col: str):
+    def multiplyTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
         self.__raw_df[result_col] = self.__raw_df[col_A] * self.__raw_df[col_B]
+        self.__formatDataframes()
+    
+    def copyColumnToColumn(self, target_col: str, result_col: str) -> None:
+        """Copy the 'target_col' data to the 'result_col'."""
+        self.__raw_df[result_col] = self.__raw_df[target_col]
+        self.__formatDataframes()
+    
+    def replaceAllValuesInColumnExcept(self, target_col: str, target_val, except_col: str, except_val) -> None:
+        """Put the 'target_val' in the 'target_col' in all cells.
+        
+        The exception case occurrs when the 'except_val' is found in the same row of the 'except_col'.
+        """
+        self.__raw_df[target_col] = self.__raw_df[target_col].where(self.__raw_df[except_col] == except_val, target_val)
         self.__formatDataframes()

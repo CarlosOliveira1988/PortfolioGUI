@@ -1,6 +1,52 @@
 from common_lib.columns import ColumnsInterface
 
 
+class ExtratoOperations:
+    def __init__(self) -> None:
+        """Structure to define possible values for the column 'Operação'."""
+        self.__main_operations_list = []
+        self.__buy = self.__addMainOperation("Compra")
+        self.__sell = self.__addMainOperation("Venda")
+        self.__rescue = self.__addMainOperation("Resgate")
+        self.__contribution = self.__addMainOperation("Transferência")
+        
+        self.__sec_operations_list = []
+        self.__income = self.__addSecondaryOperation("Provento")
+        self.__charge = self.__addSecondaryOperation("Cobrança")
+    
+    def __addMainOperation(self, operation_string: str) -> str:
+        self.__main_operations_list.append(operation_string)
+        return operation_string
+    
+    def __addSecondaryOperation(self, operation_string: str) -> str:
+        self.__sec_operations_list.append(operation_string)
+        return operation_string
+
+    def getMainOperationsList(self):
+        return self.__main_operations_list.copy()
+
+    def getSecondaryOperationsList(self):
+        return self.__sec_operations_list.copy()
+    
+    def getBuyOperation(self):
+        return self.__buy
+    
+    def getSellOperation(self):
+        return self.__sell
+    
+    def getRescueOperation(self):
+        return self.__rescue
+
+    def getContributionOperation(self):
+        return self.__contribution
+    
+    def getIncomeOperation(self):
+        return self.__income
+    
+    def getChargeOperation(self):
+        return self.__charge
+
+
 class ExtratoColumnsInterface(ColumnsInterface):
     def __init__(self) -> None:
         """Structure to define an interface of 'Extrato' columns."""
@@ -58,12 +104,18 @@ class ExtratoDBColumns(ExtratoColumnsInterface):
         super().__init__()
 
         # "Custo Total": It could be not present in the User spreadsheet, but it is
-        # Anyway, the app may calculate easily
+        # Anyway, the app may calculate it easily
         self._total_price_col = self.addRawColumn("Preço Total", "$")
         
         # "Custo Total": It could be not present in the User spreadsheet, but it is
-        # Anyway, the app may calculate easily
+        # Anyway, the app may calculate it easily
         self._total_costs_col = self.addRawColumn("Custo Total", "$")
         
-        # "Proventos Totais": It is NOT present in the User spreadsheet, but the app may calculate easily
+        # "Proventos Totais": It is NOT present in the User spreadsheet, but the app may calculate it easily
         self._total_earnings_col = self.addRawColumn("Proventos Totais", "$")
+
+        # The below columns can be extracted from the column 'Operação' and 'Preço Total'
+        self._contributions_col = self.addRawColumn("Transferência", "$")
+        self._rescues_col = self.addRawColumn("Resgate", "$")
+        self._buy_price_col = self.addRawColumn("Compra", "$")
+        self._sell_price_col = self.addRawColumn("Venda", "$")

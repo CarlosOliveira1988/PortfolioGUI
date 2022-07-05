@@ -1,6 +1,8 @@
+import numpy as np
+
 from common_lib.dataframes_kit import DataframesKitInterface
 
-from extrato_lib.extrato_columns import ExtratoColumnsInterface, ExtratoRawColumns, ExtratoDBColumns
+from extrato_lib.extrato_columns import ExtratoColumnsInterface, ExtratoRawColumns, ExtratoDBColumns, ExtratoOperations
 
 
 class ExtratoDataframesKitInterface(DataframesKitInterface):
@@ -25,6 +27,7 @@ class ExtratoDBKit(ExtratoDataframesKitInterface):
     def __init__(self) -> None:
         """Structure to handle a Pandas dataframe based on Extrato Database."""
         self._columns_object = ExtratoDBColumns()
+        self._operations_object = ExtratoOperations()
         super().__init__(self._columns_object)
         self._calculateColumnsIfNotExists()
 
@@ -35,7 +38,7 @@ class ExtratoDBKit(ExtratoDataframesKitInterface):
             self.multiplyTwoColumns(
                 self._columns_object._quantity_col.getName(), 
                 self._columns_object._unit_price_col.getName(),
-                self._columns_object._total_price_col.getName()
+                self._columns_object._total_price_col.getName(),
             )
 
     def __setTotalCostsColumn(self):
@@ -45,7 +48,7 @@ class ExtratoDBKit(ExtratoDataframesKitInterface):
             self.sumTwoColumns(
                 self._columns_object._IR_col.getName(), 
                 self._columns_object._taxes_col.getName(),
-                self._columns_object._total_costs_col.getName()
+                self._columns_object._total_costs_col.getName(),
             )
 
     def __setTotalEarningsColumn(self):
@@ -55,8 +58,53 @@ class ExtratoDBKit(ExtratoDataframesKitInterface):
             self.sumTwoColumns(
                 self._columns_object._dividends_col.getName(),
                 self._columns_object._JCP_col.getName(),
-                self._columns_object._total_earnings_col.getName()
+                self._columns_object._total_earnings_col.getName(),
             )
+
+    def __copyTotalPriceToNewColumn(self, operation_name: str, operation_col_name):
+        # Copy the 'Total Price' data to the column 'operation_col_name', where:
+        # - the 'Operation' is equal to 'operation_name'
+        # - replace values in other conditions to 0 or NaN
+        operation_col = self._columns_object._operation_col.getName()
+        total_price_col = self._columns_object._total_price_col.getName()
+        self.copyColumnToColumn(total_price_col, operation_col_name)
+        self.replaceAllValuesInColumnExcept(operation_col_name, np.nan, operation_col, operation_name)
+
+    def __setContributionsColumn(self):
+        # Copy the 'Total Price' data to the column 'Contributions', where
+        # the column 'Operation' is equal to 'Contribution';
+        # Replace values in other conditions to 0 or NaN
+        self.__copyTotalPriceToNewColumn(
+            self._operations_object.getContributionOperation(),
+            self._columns_object._contributions_col.getName(),
+        )
+    
+    def __setRescuesColumn(self):
+        # Copy the 'Total Price' data to the column 'Rescues', where
+        # the column 'Operation' is equal to 'Rescue';
+        # Replace values in other conditions to 0 or NaN
+        self.__copyTotalPriceToNewColumn(
+            self._operations_object.getRescueOperation(),
+            self._columns_object._rescues_col.getName(),
+        )
+    
+    def __setBuyPriceColumn(self):
+        # Copy the 'Total Price' data to the column 'Buy Price', where
+        # the column 'Operation' is equal to 'Buy';
+        # Replace values in other conditions to 0 or NaN
+        self.__copyTotalPriceToNewColumn(
+            self._operations_object.getBuyOperation(),
+            self._columns_object._buy_price_col.getName(),
+        )
+    
+    def __setSellPriceColumn(self):
+        # Copy the 'Total Price' data to the column 'Sell Price', where
+        # the column 'Operation' is equal to 'Sell';
+        # Replace values in other conditions to 0 or NaN
+        self.__copyTotalPriceToNewColumn(
+            self._operations_object.getSellOperation(),
+            self._columns_object._sell_price_col.getName(),
+        )
 
     def _calculateColumnsIfNotExists(self):
         """Method Inherited from 'DataframesKitInterface' class.
@@ -67,6 +115,10 @@ class ExtratoDBKit(ExtratoDataframesKitInterface):
         self.__setTotalPriceColumn()
         self.__setTotalCostsColumn()
         self.__setTotalEarningsColumn()
+        self.__setContributionsColumn()
+        self.__setRescuesColumn()
+        self.__setBuyPriceColumn()
+        self.__setSellPriceColumn()
 
     def getColumnsObject(self) -> ExtratoDBColumns:
         return self._columns_object

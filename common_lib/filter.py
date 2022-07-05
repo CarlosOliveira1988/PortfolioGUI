@@ -1,20 +1,22 @@
 import pandas as pd
 
-from common_lib.columns import ColumnsInterface
-from common_lib.dataframes_kit import DataframesKitInterface
+from extrato_lib.extrato_columns import ExtratoColumnsInterface
+from extrato_lib.extrato_dataframes_kit import ExtratoDataframesKitInterface
 
 
 class FilterInterface:
-    def __init__(self, df_interface_object: DataframesKitInterface, columns_object: ColumnsInterface) -> None:
-        """Structure to apply filters to different types of DataframesKitInterface objects.
+    def __init__(self, df_interface_object: ExtratoDataframesKitInterface, columns_object: ExtratoColumnsInterface) -> None:
+        """Structure to apply filters to different types of ExtratoDataframesKitInterface objects.
                 
-        The main output of this class are:
+        The main outputs of this class are:
         - filtered dataframe
         - filtered formatted dataframe
         
+        This class is very useful to work together with 'SideBar' classes.
+        
         Args:
-        - df_interface_object: an instance based on 'DataframesKitInterface' class
-        - columns_object: an instance based on 'ColumnsInterface' class
+        - df_interface_object: an instance based on 'ExtratoDataframesKitInterface' class
+        - columns_object: an instance based on 'ExtratoColumnsInterface' class
         """
         self.__df_interface_object = df_interface_object
         self.__columns_object = columns_object
