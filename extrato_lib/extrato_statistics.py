@@ -68,12 +68,12 @@ class StatisticsInterface:
         return str_a + str_b
 
     def __runStatistics(self) -> None:
-        self._output_dataframe = self._getResultDataframe()
-        self.setStatisticsDataframe(self._output_dataframe)
+        self.__output_dataframe = self._getResultDataframe()
+        self.setStatisticsDataframe(self.__output_dataframe)
 
     def _initDataframes(self) -> None:
         self._input_dataframe = ExtratoDBKit().getNotNanDataframe()
-        self._output_dataframe = self._getResultDataframe()
+        self.__output_dataframe = self._getResultDataframe()
     
     def _getConcatDataframes(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
         # Basically, return a 3 columns dataframe: 'Date', 'Price+' and 'Price-'
@@ -106,7 +106,7 @@ class StatisticsInterface:
         self.__runStatistics()
 
     def getResultDataframe(self) -> pd.DataFrame:
-        return self._output_dataframe.copy()
+        return self.__output_dataframe.copy()
 
 
 class OperationTotalPriceStatistics(StatisticsInterface):

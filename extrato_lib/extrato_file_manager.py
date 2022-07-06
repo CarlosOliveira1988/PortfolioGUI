@@ -9,7 +9,7 @@ class FileManager:
         self.__loadDotEnvFile()
         if not self.__dotEnvFileExists():
             self.__saveDotEnvFile(self.__getDefaultExtratoFile())
-        self.extrato_file = self.__getExtratoFile()
+        self.__extrato_file = self.__getExtratoFile()
 
     def __loadDotEnvFile(self):
         load_dotenv(encoding="iso-8859-1")
@@ -50,9 +50,9 @@ class FileManager:
 
         When the user file is not found, then returns the default file.
         """
-        return self.extrato_file
+        return self.__extrato_file
 
     def setExtratoFile(self, file):
         """Set the path related to the Extrato spreadsheet in the .ENV file."""
         self.__saveDotEnvFile(file)
-        self.extrato_file = file
+        self.__extrato_file = file

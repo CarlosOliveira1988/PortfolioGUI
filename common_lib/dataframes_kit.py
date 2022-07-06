@@ -105,9 +105,9 @@ class DataframesKitInterface:
         Args:
         - columns_object: any instance based on 'ColumnsInterface' class
         """
-        self._columns_object = columns_object
-        self.__kit_formatter = DataframesKitFormatter(self._columns_object)
-        self.__raw_df = pd.DataFrame(columns=self._columns_object.getColumnsNameList())
+        self.__columns_object = columns_object
+        self.__kit_formatter = DataframesKitFormatter(self.__columns_object)
+        self.__raw_df = pd.DataFrame(columns=self.__columns_object.getColumnsNameList())
         self.__formatDataframes()
     
     def __formatDataframes(self):
@@ -117,7 +117,7 @@ class DataframesKitInterface:
         # There are cases that we want to create more columns than exists in the User spreadsheet
         # Then we need to create them witn NaN values
         # The 'setAsUserData' method help us to indicate the state of the data
-        for column, raw_column_obj in self._columns_object.getRawColumnsDict().items():
+        for column, raw_column_obj in self.__columns_object.getRawColumnsDict().items():
             if column not in dataframe.columns:
                 # The data column is not present in the User spreadsheet
                 # Afterwards, probably it will needed to check this state when hanlding the data
@@ -145,9 +145,6 @@ class DataframesKitInterface:
     
     def getFormattedDataframe(self) -> pd.DataFrame:
         return self.__kit_formatter.getFormattedDataframe()
-    
-    def getColumnsObject(self) -> ColumnsInterface:
-        return self._columns_object
     
     def sumTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
         self.__raw_df[result_col] = self.__raw_df[col_A] + self.__raw_df[col_B]

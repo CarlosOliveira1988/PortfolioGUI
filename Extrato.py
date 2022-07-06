@@ -1,6 +1,10 @@
+import os
+
 import streamlit as st
 
-from common_lib.config import FileManager
+from subprocess import call
+
+from extrato_lib.extrato_file_manager import FileManager
 
 
 class ExtratoGUI:
@@ -31,9 +35,7 @@ class ExtratoGUI:
         # Workaround to open files using the PyQt instead of Streamlit
         # Unfortunately, Streamlit library does not return the file path
         # when using the 'file_uploader' component
-        import os
-        from subprocess import call
-        file_path = os.path.join(os.getcwd(), "common_lib", "file_dialog.py")
+        file_path = os.path.join(os.getcwd(), "extrato_lib", "extrato_file_dialog.py")
         call(["python", file_path])
         file_manager = FileManager()
         st.session_state.extrato_file = file_manager.getExtratoFile()
