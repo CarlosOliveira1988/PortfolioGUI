@@ -1,5 +1,6 @@
 import streamlit as st
 
+from extrato_lib.extrato_columns import ExtratoDBColumns
 from extrato_lib.extrato_side_bar import ExtratoDBSideBar
 from extrato_lib.extrato_statistics import OperationTotalPriceStatistics
 
@@ -9,11 +10,15 @@ class ExtratoAccountInfo:
         """Structure used to show a Bar Chart and other information related to the 'Extrato Account'.
         
         This class uses the following considerations:
-        - it uses the columns 'Data', 'Operação' and 'Preço Unitário' to extract useful data
-        - 'Operação::Transferência' are positive values (put money in the account)
-        - 'Operação::Resgate' are negative values (take money from the account)
+        - column 'Data': filtering data
+        - column 'Transferência': positive values (put money in the account)
+        - column 'Resgate': negative values (take money out the account)
         """
-        self.__statistics = OperationTotalPriceStatistics("Transferência", "Resgate")
+        self.__columns_object = ExtratoDBColumns()
+        self.__statistics = OperationTotalPriceStatistics(
+            self.__columns_object._contributions_col.getName(),
+            self.__columns_object._rescues_col.getName(),
+        )
 
     def setDataframe(self, dataframe):
         self.__statistics.setDataframe(dataframe)

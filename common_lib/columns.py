@@ -16,7 +16,7 @@ class ColumnsInterface:
         raw_column = RawColumn(column_name, column_type)
         self.__columns_name_list.append(column_name)
         self.__columns_type_list.append(column_type)
-        self.__columns_nan_list.append(self.getNanValueDict().get(column_name, ""))
+        self.__columns_nan_list.append(self.getNanValueDict().get(column_type, ""))
         self.__raw_columns_list.append(raw_column)
         return raw_column
     

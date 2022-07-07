@@ -1,7 +1,8 @@
 import streamlit as st
 
+from extrato_lib.extrato_columns import ExtratoDBColumns
 from extrato_lib.extrato_side_bar import ExtratoDBSideBar
-from extrato_lib.extrato_statistics import OperationTotalPriceStatistics, EarnsCostsStatistics
+from extrato_lib.extrato_statistics import OperationTotalPriceStatistics
 
 
 class ExtratoAssetsInfo:
@@ -9,11 +10,15 @@ class ExtratoAssetsInfo:
         """Structure used to show a Bar Chart and other information related to the 'Extrato Assets'.
         
         This class uses the following considerations:
-        - it uses the columns 'Data', 'Operação' and 'Preço Unitário' to extract useful data
-        - 'Operação::Venda' are positive values (put money in the account)
-        - 'Operação::Compra' are negative values (take money from the account)
+        - column 'Data': filtering data
+        - column 'Venda': positive values (put money in the account)
+        - column 'Compra': negative values (take money out the account)
         """
-        self.__statistics = OperationTotalPriceStatistics("Venda", "Compra")
+        self.__columns_object = ExtratoDBColumns()
+        self.__statistics = OperationTotalPriceStatistics(
+            self.__columns_object._sell_price_col.getName(),
+            self.__columns_object._buy_price_col.getName(),
+        )
         
     def setDataframe(self, dataframe):
         self.__statistics.setDataframe(dataframe)
@@ -36,11 +41,15 @@ class ExtratoEarnsCostsInfo:
         """Structure used to show a Bar Chart and other information related to the 'Extrato Earns & Costs'.
         
         This class uses the following considerations:
-        - it uses the columns 'Data', 'Proventos Totais' and 'Custo Total' to extract useful data
-        - 'Proventos Totais' are positive values (put money in the account)
-        - 'Custo Total' are negative values (take money from the account)
+        - column 'Data': filtering data
+        - column 'Proventos Totais': positive values (put money in the account)
+        - column 'Custo Total': negative values (take money out the account)
         """
-        self.__statistics = EarnsCostsStatistics()
+        self.__columns_object = ExtratoDBColumns()
+        self.__statistics = OperationTotalPriceStatistics(
+            self.__columns_object._total_earnings_col.getName(),
+            self.__columns_object._total_costs_col.getName(),
+        )
         
     def setDataframe(self, dataframe):
         self.__statistics.setDataframe(dataframe)

@@ -41,9 +41,7 @@ class DataframesKitFormatter:
         """
         self.__columns_object = columns_object
         self.__formatter = SingleFormatter()
-        self.formatDataframes(
-            self.__getRawDataframe(pd.DataFrame(columns=self.__columns_object.getColumnsNameList()))
-        )
+        self.formatDataframes(self.__getRawDataframe(pd.DataFrame(columns=self.__columns_object.getColumnsNameList())))
 
     def __getRawDataframe(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         return self.__defineDisplayedColumns(dataframe)
@@ -61,7 +59,7 @@ class DataframesKitFormatter:
     
     def __setupNanColumns(self, dataframe: pd.DataFrame) -> pd.DataFrame:
         for column, nan_value in self.__columns_object.getColumnsNanDict().items():
-            dataframe[column] = dataframe[column].replace(np.nan, nan_value)
+            dataframe[column] = dataframe[column].fillna(nan_value)
         return dataframe
 
     def __getNotNanDataframe(self, dataframe: pd.DataFrame) -> pd.DataFrame:
@@ -107,62 +105,28 @@ class DataframesKitInterface:
         """
         self.__columns_object = columns_object
         self.__kit_formatter = DataframesKitFormatter(self.__columns_object)
-        self.__raw_df = pd.DataFrame(columns=self.__columns_object.getColumnsNameList())
-        self.__formatDataframes()
-    
-    def __formatDataframes(self):
-        self.__kit_formatter.formatDataframes(self.__raw_df)
-    
-    def __addColumnsIfNotExists(self, dataframe):
-        # There are cases that we want to create more columns than exists in the User spreadsheet
-        # Then we need to create them witn NaN values
-        # The 'setAsUserData' method help us to indicate the state of the data
+        self._raw_df = pd.DataFrame(columns=self.__columns_object.getColumnsNameList())
+        self.formatDataframes()
+
+    def addColumnIfNotExists(self, dataframe):
+        # Create the column witn NaN values
         for column, raw_column_obj in self.__columns_object.getRawColumnsDict().items():
             if column not in dataframe.columns:
-                # The data column is not present in the User spreadsheet
-                # Afterwards, probably it will needed to check this state when hanlding the data
                 dataframe[column] = np.nan
-                raw_column_obj.setAsUserData(False)
-            else:
-                # The application will just consume the User data
-                raw_column_obj.setAsUserData(True)
         return dataframe
-    
-    def _calculateColumnsIfNotExists(self):
-        """Abstract method to perform any calculation with non-exists dataframe columns."""
-        pass
-    
+
+    def formatDataframes(self):
+        self.__kit_formatter.formatDataframes(self._raw_df)
+
     def readExcelFile(self, file) -> None:
-        self.__raw_df = self.__addColumnsIfNotExists(pd.read_excel(file))
-        self._calculateColumnsIfNotExists()
-        self.__formatDataframes()
+        self._raw_df = self.addColumnIfNotExists(pd.read_excel(file))
+        self.formatDataframes()
 
     def getRawDataframe(self) -> pd.DataFrame:
-        return self.__raw_df.copy()
+        return self._raw_df.copy()
     
     def getNotNanDataframe(self) -> pd.DataFrame:
         return self.__kit_formatter.getNotNanDataframe()
     
     def getFormattedDataframe(self) -> pd.DataFrame:
         return self.__kit_formatter.getFormattedDataframe()
-    
-    def sumTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
-        self.__raw_df[result_col] = self.__raw_df[col_A] + self.__raw_df[col_B]
-        self.__formatDataframes()
-    
-    def multiplyTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
-        self.__raw_df[result_col] = self.__raw_df[col_A] * self.__raw_df[col_B]
-        self.__formatDataframes()
-    
-    def copyColumnToColumn(self, target_col: str, result_col: str) -> None:
-        """Copy the 'target_col' data to the 'result_col'."""
-        self.__raw_df[result_col] = self.__raw_df[target_col]
-        self.__formatDataframes()
-    
-    def replaceAllValuesInColumnExcept(self, target_col: str, target_val, except_col: str, except_val) -> None:
-        """Put the 'target_val' in the 'target_col' in all cells.
-        
-        The exception case occurrs when the 'except_val' is found in the same row of the 'except_col'.
-        """
-        self.__raw_df[target_col] = self.__raw_df[target_col].where(self.__raw_df[except_col] == except_val, target_val)
-        self.__formatDataframes()
