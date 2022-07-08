@@ -66,36 +66,41 @@ class StatisticsInterface:
         self.__neg_operation = neg_operation
         self.__formatter = SingleFormatter()
         self.__statistics = StatisticsCell()
+        self.__initColumnVariables()
+        self.__initDataframes()
+
+    def __initColumnVariables(self) -> None:
+        columns_object = ExtratoDBColumns()
+        self.__date_column = columns_object._date_col.getName()
+
+    def __initDataframes(self) -> None:
+        self.__input_dataframe = ExtratoDBKit().getNotNanDataframe()
+        self.__output_dataframe = self.__getResultDataframe()
+
+    def __getResultDataframe(self) -> pd.DataFrame:
+        # Basically, return a 3 columns dataframe: 'Date', 'Price+' and 'Price-'
+        target_dataframe = self.__input_dataframe.copy()
+        df = target_dataframe[[self.__date_column, self.__pos_operation, self.__neg_operation]]
+        df[self.__neg_operation] = df[self.__neg_operation] * (-1)
+        return self.__setDateColumnAsIndex(df)
+
+    def __setStatisticsDataframe(self, df: pd.DataFrame) -> tuple:
+        self.__statistics.setPositiveValues(df, self.__pos_operation)
+        self.__statistics.setNegativeValues(df, self.__neg_operation)
+
+    def __runStatistics(self) -> None:
+        self.__output_dataframe = self.__getResultDataframe()
+        self.__setStatisticsDataframe(self.__output_dataframe)
+    
+    def __setDateColumnAsIndex(self, df):
+        columns_object = ExtratoDBColumns()
+        self.__date_column = columns_object._date_col.getName()
+        return df.rename(columns={self.__date_column:'index'}).set_index('index')
 
     def __getFormattedString(self, sum_value: float, count_value: int) -> str:
         str_a = self.__formatter.getMoneyString(sum_value)
         str_b = ' [' + str(count_value) + ']'
         return str_a + str_b
-
-    def __runStatistics(self) -> None:
-        self.__output_dataframe = self._getResultDataframe()
-        self.setStatisticsDataframe(self.__output_dataframe)
-
-    def _initDataframes(self) -> None:
-        self._input_dataframe = ExtratoDBKit().getNotNanDataframe()
-        self.__output_dataframe = self._getResultDataframe()
-    
-    def _getConcatDataframes(self, df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
-        # Basically, return a 3 columns dataframe: 'Date', 'Price+' and 'Price-'
-        df = pd.concat([df1, df2])
-        return self._setDateColumnAsIndex(df)
-    
-    def _setDateColumnAsIndex(self, df):
-        columns_object = ExtratoDBColumns()
-        self.__date_column = columns_object._date_col.getName()
-        return df.rename(columns={self.__date_column:'index'}).set_index('index')
-    
-    def _getResultDataframe(self) -> pd.DataFrame:
-        return self._input_dataframe.copy()
-
-    def setStatisticsDataframe(self, df: pd.DataFrame) -> tuple:
-        self.__statistics.setPositiveValues(df, self.__pos_operation)
-        self.__statistics.setNegativeValues(df, self.__neg_operation)
 
     def getPositiveOperationString(self) -> str:
         return self.__getFormattedString(self.__statistics.getPositiveSum(), self.__statistics.getPositiveCount())
@@ -107,39 +112,8 @@ class StatisticsInterface:
         return self.__getFormattedString(self.__statistics.getDeltaSum(), self.__statistics.getDeltaCount())
 
     def setDataframe(self, dataframe) -> None:
-        self._input_dataframe = dataframe
+        self.__input_dataframe = dataframe
         self.__runStatistics()
 
     def getResultDataframe(self) -> pd.DataFrame:
         return self.__output_dataframe.copy()
-
-
-class OperationTotalPriceStatistics(StatisticsInterface):
-    def __init__(self, pos_operation: str, neg_operation: str) -> None:
-        """Structure used to prepare a dataframe to calculate statistics related to Extrato.
-        
-        This class uses the following columns to extract useful data:
-        - 'Data'
-        - 'Operação'
-        - 'Preço Total'
-        
-        Args:
-        - pos_operation (str): column defined as 'positive values' (Example: 'Venda')
-        - neg_operation (str): column defined as 'negative values' (Example: 'Compra')
-        """
-        self.__pos_operation = pos_operation
-        self.__neg_operation = neg_operation
-        super().__init__(self.__pos_operation, self.__neg_operation)
-        self._initColumnVariables()
-        self._initDataframes()
-
-    def _initColumnVariables(self) -> None:
-        columns_object = ExtratoDBColumns()
-        self.__date_column = columns_object._date_col.getName()
-
-    def _getResultDataframe(self) -> pd.DataFrame:
-        # Basically, return a 3 columns dataframe: 'Date', 'Price+' and 'Price-'
-        target_dataframe = self._input_dataframe.copy()
-        df = target_dataframe[[self.__date_column, self.__pos_operation, self.__neg_operation]]
-        df[self.__neg_operation] = df[self.__neg_operation] * (-1)
-        return self._setDateColumnAsIndex(df)

@@ -2,7 +2,7 @@ import streamlit as st
 
 from extrato_lib.extrato_columns import ExtratoDBColumns
 from extrato_lib.extrato_side_bar import ExtratoDBSideBar
-from extrato_lib.extrato_statistics import OperationTotalPriceStatistics
+from extrato_lib.extrato_statistics import StatisticsInterface
 
 
 class ExtratoAssetsInfo:
@@ -15,7 +15,7 @@ class ExtratoAssetsInfo:
         - column 'Compra': negative values (take money out the account)
         """
         self.__columns_object = ExtratoDBColumns()
-        self.__statistics = OperationTotalPriceStatistics(
+        self.__statistics = StatisticsInterface(
             self.__columns_object._sell_price_col.getName(),
             self.__columns_object._buy_price_col.getName(),
         )
@@ -46,7 +46,7 @@ class ExtratoEarnsCostsInfo:
         - column 'Custo Total': negative values (take money out the account)
         """
         self.__columns_object = ExtratoDBColumns()
-        self.__statistics = OperationTotalPriceStatistics(
+        self.__statistics = StatisticsInterface(
             self.__columns_object._total_earnings_col.getName(),
             self.__columns_object._total_costs_col.getName(),
         )

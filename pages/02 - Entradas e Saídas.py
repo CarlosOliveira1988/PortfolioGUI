@@ -2,7 +2,7 @@ import streamlit as st
 
 from extrato_lib.extrato_columns import ExtratoDBColumns
 from extrato_lib.extrato_side_bar import ExtratoDBSideBar
-from extrato_lib.extrato_statistics import OperationTotalPriceStatistics
+from extrato_lib.extrato_statistics import StatisticsInterface
 
 
 class ExtratoAccountInfo:
@@ -15,7 +15,7 @@ class ExtratoAccountInfo:
         - column 'Resgate': negative values (take money out the account)
         """
         self.__columns_object = ExtratoDBColumns()
-        self.__statistics = OperationTotalPriceStatistics(
+        self.__statistics = StatisticsInterface(
             self.__columns_object._contributions_col.getName(),
             self.__columns_object._rescues_col.getName(),
         )
