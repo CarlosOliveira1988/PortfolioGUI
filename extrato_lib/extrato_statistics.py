@@ -91,10 +91,8 @@ class StatisticsInterface:
     def __runStatistics(self) -> None:
         self.__output_dataframe = self.__getResultDataframe()
         self.__setStatisticsDataframe(self.__output_dataframe)
-    
+
     def __setDateColumnAsIndex(self, df):
-        columns_object = ExtratoDBColumns()
-        self.__date_column = columns_object._date_col.getName()
         return df.rename(columns={self.__date_column:'index'}).set_index('index')
 
     def __getFormattedString(self, sum_value: float, count_value: int) -> str:
@@ -104,16 +102,16 @@ class StatisticsInterface:
 
     def getPositiveOperationString(self) -> str:
         return self.__getFormattedString(self.__statistics.getPositiveSum(), self.__statistics.getPositiveCount())
-    
+
     def getNegativeOperationString(self) -> str:
         return self.__getFormattedString(self.__statistics.getNegativeSum(),self.__statistics.getNegativeCount())
     
     def getDeltaOperationString(self) -> str:
         return self.__getFormattedString(self.__statistics.getDeltaSum(), self.__statistics.getDeltaCount())
 
+    def getResultDataframe(self) -> pd.DataFrame:
+        return self.__output_dataframe.copy()
+
     def setDataframe(self, dataframe) -> None:
         self.__input_dataframe = dataframe
         self.__runStatistics()
-
-    def getResultDataframe(self) -> pd.DataFrame:
-        return self.__output_dataframe.copy()
