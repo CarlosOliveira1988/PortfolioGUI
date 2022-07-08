@@ -1,0 +1,20 @@
+name: Locale
+on: [push]
+
+jobs:
+  build:
+    name: Setup Locale variables for Linux environment (included Streamlit)
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: SetLocale
+      run: |
+        sudo update-locale LANG=LANG=pt_BR.UTF-8 LANGUAGE
