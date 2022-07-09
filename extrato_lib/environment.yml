@@ -1,3 +1,0 @@
-name: stats
-dependencies:
-  - PyQt5=5.15.7

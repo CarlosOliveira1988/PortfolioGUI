@@ -1,8 +1,5 @@
-import os
-
+import easygui
 import streamlit as st
-
-from subprocess import call
 
 from extrato_lib.extrato_file_manager import FileManager
 
@@ -16,6 +13,8 @@ class ExtratoGUI:
         - If the '.env' file does not exist, create a new one with the Extrato spreadsheet path.
         - If the '.env' file already exists, then uses the saved Extrato spreadsheet path.
         """
+        self.file_manager = FileManager()
+        st.session_state.extrato_file = self.file_manager.getExtratoFile()
         self.__showInfo()
 
     def __showMainTitle(self) -> None:
@@ -32,25 +31,22 @@ class ExtratoGUI:
         self.__showFileSelector()
 
     def __openFile(self):
-        # Workaround to open files using the PyQt instead of Streamlit
-        # Unfortunately, Streamlit library does not return the file path
-        # when using the 'file_uploader' component
-        file_path = os.path.join(os.getcwd(), "extrato_lib", "extrato_file_dialog.py")
-        call(["python", file_path])
-        file_manager = FileManager()
-        st.session_state.extrato_file = file_manager.getExtratoFile()
-        st.markdown(
-            """
-            :disappointed_relieved: Por limitações do Streamlit, ainda não resolvidas...
-            
-            :sweat_smile: **Por favor, reinicie a aplicação para carregar o novo arquivo!**
-            É necessário fechar a página e também o prompt de comandos.
-            """
+        file_path = easygui.fileopenbox(
+            "Selecione o arquivo XLSX relacionado ao portfolio",
+            filetypes = ["*.xlsx", "*.xls"]
         )
-        st.stop()
+        if file_path:
+            self.file_manager.setExtratoFile(file_path)
+            st.session_state.extrato_file = self.file_manager.getExtratoFile()
+            st.markdown(
+                """
+                :disappointed_relieved: Por limitações do Streamlit, ainda não resolvidas...
+                
+                :sweat_smile: **Por favor, reinicie a aplicação para carregar o novo arquivo!**
+                É necessário fechar tanto a página quanto o prompt de comandos.
+                """
+            )
+            st.stop()
 
-
-file_manager = FileManager()
-st.session_state.extrato_file = file_manager.getExtratoFile()
 
 extrato_gui = ExtratoGUI()
