@@ -1,4 +1,4 @@
-import easygui
+from easygui import fileopenbox
 import streamlit as st
 
 from extrato_lib.extrato_file_manager import FileManager
@@ -31,7 +31,7 @@ class ExtratoGUI:
         self.__showFileSelector()
 
     def __openFile(self):
-        file_path = easygui.fileopenbox(
+        file_path = fileopenbox(
             "Selecione o arquivo XLSX relacionado ao portfolio",
             filetypes = ["*.xlsx", "*.xls"]
         )
