@@ -4,6 +4,5 @@ openpyxl==3.0.7
 pandas==1.3.0
 python-dotenv==0.20.0
 streamlit==1.10.0
-tzlocal==4.2
 tkinter==3.9.13
 tkinterdnd2==0.3.0
