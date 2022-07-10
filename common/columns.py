@@ -1,4 +1,4 @@
-from common_lib.raw_column import RawColumn
+from common.raw_column import RawColumn
 
 
 class ColumnsInterface:

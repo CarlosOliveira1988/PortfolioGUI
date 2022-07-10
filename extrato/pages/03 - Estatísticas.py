@@ -1,8 +1,8 @@
 import streamlit as st
 
-from extrato_lib.extrato_columns import ExtratoDBColumns
-from extrato_lib.extrato_side_bar import ExtratoDBSideBar
-from extrato_lib.extrato_statistics import StatisticsInterface
+from extrato.lib.extrato_columns import ExtratoDBColumns
+from extrato.lib.extrato_side_bar import ExtratoDBSideBar
+from extrato.lib.extrato_statistics import StatisticsInterface
 
 
 class ExtratoAssetsInfo:

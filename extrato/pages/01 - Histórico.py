@@ -1,8 +1,8 @@
 import pandas as pd
 import streamlit as st
 
-from extrato_lib.extrato_dataframes_kit import ExtratoRawKit
-from extrato_lib.extrato_side_bar import ExtratoRawSideBar
+from extrato.lib.extrato_dataframes_kit import ExtratoRawKit
+from extrato.lib.extrato_side_bar import ExtratoRawSideBar
 
 
 class ExtratoRawTableInfo:

@@ -2,7 +2,7 @@ import os
 
 import streamlit as st
 
-from extrato_lib.extrato_file_manager import FileManager
+from extrato.lib.extrato_file_manager import FileManager
 
 
 class ExtratoGuiLocal:
