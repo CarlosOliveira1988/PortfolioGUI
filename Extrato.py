@@ -1,70 +1,28 @@
-import os
-
 import streamlit as st
 
-from extrato_lib.extrato_file_manager import FileManager
 
-
-class ExtratoGUI:
-    def __init__(self) -> None:
-        """Structure used to open files related to Extrato.
+class ExtratoGuiWeb:
+    def __init__(self):
+        """Structure used to open files related to Extrato in 'Streamlit Cloud'.
         
-        The 'FileManager' is used in the entire project when handling Extrato spreadsheet path.
-        It works based on '.env' files:
-        - If the '.env' file does not exist, create a new one with the Extrato spreadsheet path.
-        - If the '.env' file already exists, then uses the saved Extrato spreadsheet path.
+        When running in 'Streamlit Cloud', the user needs to push manually the Extrato file in every iteraction.
+        For now, I don't know how to do user file management in 'Streamlit Cloud'.
         """
-        self.file_manager = FileManager()
-        st.session_state.extrato_file = self.file_manager.getExtratoFile()
         self.__showInfo()
 
     def __showMainTitle(self) -> None:
         st.write('# Extrato')
 
-    def __showFolderSelector(self) -> None:
-        folder_path_default = os.path.dirname(st.session_state.extrato_file)
-        self.folder_path = st.text_input(
-            "Digite no campo o local do arquivo Extrato: ",
-            value = folder_path_default,
-        )
-
-    def __showFileSelector(self):
-        filenames = [file for file in os.listdir(self.folder_path) if file.endswith((".xls", ".xlsx"))]
-        selected_filename = st.selectbox('Selecione o arquivo Extrato: ', filenames)
-        self.file_path = os.path.join(self.folder_path, selected_filename)
-
-    def __showSelectedFile(self):
-        st.write('Planilha atual: ', st.session_state.extrato_file)
-
-    def __showUpdateFileButton(self):
-        if st.button("Selecionar"):
-            self.__updateExtratoFile()        
-
-    def __updateExtratoFile(self):
-        if os.path.isfile(self.file_path):
-            if self.file_path != st.session_state.extrato_file:
-                self.file_manager.setExtratoFile(self.file_path)
-                st.session_state.extrato_file = self.file_manager.getExtratoFile()
-                self.__showBadBehaviorInfo()
-
-    def __showBadBehaviorInfo(self):
-        st.write('Planilha selecionada: ', st.session_state.extrato_file)
-        st.markdown(
-            """
-            :disappointed_relieved: Por limitações do Streamlit, ainda não resolvidas...
-            
-            :sweat_smile: **Por favor, reinicie a aplicação para carregar o novo arquivo!**
-            É necessário fechar tanto a página quanto o prompt de comandos.
-            """
-        )
-        st.stop()
+    def __showFileUploader(self) -> None:
+        uploaded_file = st.file_uploader('Selecione o arquivo Extrato: ', type=[".xls", ".xlsx"])
+        if uploaded_file is not None:
+            # At this point, 'st.session_state.extrato_file' is a "file-like" object
+            st.session_state.extrato_file = uploaded_file
 
     def __showInfo(self) -> None:
         self.__showMainTitle()
-        self.__showFolderSelector()
-        self.__showFileSelector()
-        self.__showSelectedFile()
-        self.__showUpdateFileButton()
+        self.__showFileUploader()
 
 
-extrato_gui = ExtratoGUI()
+if __name__ == "__main__":
+    extrato_gui = ExtratoGuiWeb()
