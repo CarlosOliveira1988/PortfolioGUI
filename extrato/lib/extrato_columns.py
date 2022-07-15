@@ -119,3 +119,6 @@ class ExtratoDBColumns(ExtratoColumnsInterface):
         self._rescues_col = self.addRawColumn("Resgate", "$")
         self._buy_price_col = self.addRawColumn("Compra", "$")
         self._sell_price_col = self.addRawColumn("Venda", "$")
+
+        # Slice columns
+        self._slice_index_col = self.addRawColumn("Slice Index", "number")
