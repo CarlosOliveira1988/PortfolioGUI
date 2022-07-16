@@ -1,11 +1,11 @@
 import pandas as pd
 
-from extrato.lib.extrato_dataframes_kit import ExtratoDBKitInterface, ExtratoDBKit
+from extrato.lib.extrato_dataframes_kit import DataframesDBKitInterface, ExtratoDBKit
 
 from positions.lib.closed_columns import ClosedPositionDBColumns
 
 
-class ClosedPositionDBKit(ExtratoDBKitInterface):
+class ClosedPositionDBKit(DataframesDBKitInterface):
     def __init__(self) -> None:
         """Structure to handle a Pandas dataframe to show Closed Positions."""
         self.__extrato_kit_object = ExtratoDBKit()
@@ -18,7 +18,7 @@ class ClosedPositionDBKit(ExtratoDBKitInterface):
         pass
 
     def readExcelFile(self, file) -> None:
-        """Method Inherited from 'ExtratoDBKitInterface' class."""
+        """Method Inherited from 'DataframesDBKitInterface' class."""
         self._raw_df = self.addColumnIfNotExists(pd.read_excel(file))
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()

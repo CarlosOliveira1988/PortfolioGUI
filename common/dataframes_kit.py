@@ -138,3 +138,33 @@ class DataframesKitInterface:
             df_column.dropna()
         df_column = df_column.drop_duplicates()
         return df_column[target_col].to_list()
+
+
+class DataframesDBKitInterface(DataframesKitInterface):
+    def __init__(self, columns_object: ColumnsInterface) -> None:
+        """Structure to handle a Pandas dataframe to perform some calculations.
+        
+        Args:
+        - columns_object: any object instance inherited from 'ColumnsInterface'
+        """
+        self.__columns_object = columns_object
+        super().__init__(self.__columns_object)
+
+    def sumTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
+        """Sum the 'col_A' and 'col_B' to put the result in the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[col_A] + self._raw_df[col_B]
+
+    def multiplyTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
+        """Multiply the 'col_A' and 'col_B' to put the result in the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[col_A] * self._raw_df[col_B]
+
+    def copyColumnToColumn(self, target_col: str, result_col: str) -> None:
+        """Copy the 'target_col' data to the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[target_col]
+
+    def replaceAllValuesInColumnExcept(self, target_col: str, target_val, except_col: str, except_val) -> None:
+        """Put the 'target_val' in all cells of the 'target_col'.
+        
+        The exception case occurrs in the line when the 'except_val' is found in the 'except_col'.
+        """
+        self._raw_df[target_col] = self._raw_df[target_col].where(self._raw_df[except_col] == except_val, target_val)
