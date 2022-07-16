@@ -7,7 +7,10 @@ from extrato.lib.extrato_dataframes_kit import ExtratoDataframesKitInterface, Ex
 
 
 class ExtratoFilterInterface(FilterInterface):
-    def __init__(self, columns_object: ExtratoColumnsInterface, df_interface_object: ExtratoDataframesKitInterface) -> None:
+    def __init__(
+        self, columns_object: ExtratoColumnsInterface,
+        df_interface_object: ExtratoDataframesKitInterface
+    ) -> None:
         """Structure to apply filters based on Extrato objects.
         
         Args:
