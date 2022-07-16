@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 
 from extrato.lib.extrato_columns import ExtratoDBColumns
@@ -20,7 +21,7 @@ class ExtratoAccountInfo:
             self.__columns_object._rescues_col.getName(),
         )
 
-    def setDataframe(self, dataframe):
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
         self.__statistics.setDataframe(dataframe)
     
     def showInfo(self) -> None:

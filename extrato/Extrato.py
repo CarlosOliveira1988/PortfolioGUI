@@ -2,7 +2,7 @@ import streamlit as st
 
 
 class ExtratoGuiWeb:
-    def __init__(self):
+    def __init__(self) -> None:
         """Structure used to open files related to Extrato in 'Streamlit Cloud'.
         
         When running in 'Streamlit Cloud', the user needs to push manually the Extrato file in every iteraction.

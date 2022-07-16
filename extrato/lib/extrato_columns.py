@@ -22,28 +22,28 @@ class ExtratoOperations:
         self.__sec_operations_list.append(operation_string)
         return operation_string
 
-    def getMainOperationsList(self):
+    def getMainOperationsList(self) -> list:
         return self.__main_operations_list.copy()
 
-    def getSecondaryOperationsList(self):
+    def getSecondaryOperationsList(self) -> list:
         return self.__sec_operations_list.copy()
     
-    def getBuyOperation(self):
+    def getBuyOperation(self) -> str:
         return self.__buy
     
-    def getSellOperation(self):
+    def getSellOperation(self) -> str:
         return self.__sell
     
-    def getRescueOperation(self):
+    def getRescueOperation(self) -> str:
         return self.__rescue
 
-    def getContributionOperation(self):
+    def getContributionOperation(self) -> str:
         return self.__contribution
     
-    def getIncomeOperation(self):
+    def getIncomeOperation(self) -> str:
         return self.__income
     
-    def getChargeOperation(self):
+    def getChargeOperation(self) -> str:
         return self.__charge
 
 

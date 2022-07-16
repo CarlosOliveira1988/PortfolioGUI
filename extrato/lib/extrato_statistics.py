@@ -84,7 +84,7 @@ class StatisticsInterface:
         df[self.__neg_operation] = df[self.__neg_operation] * (-1)
         return self.__setDateColumnAsIndex(df)
 
-    def __setStatisticsDataframe(self, df: pd.DataFrame) -> tuple:
+    def __setStatisticsDataframe(self, df: pd.DataFrame) -> None:
         self.__statistics.setPositiveValues(df, self.__pos_operation)
         self.__statistics.setNegativeValues(df, self.__neg_operation)
 
@@ -92,7 +92,7 @@ class StatisticsInterface:
         self.__output_dataframe = self.__getResultDataframe()
         self.__setStatisticsDataframe(self.__output_dataframe)
 
-    def __setDateColumnAsIndex(self, df):
+    def __setDateColumnAsIndex(self, df: pd.DataFrame) -> pd.DataFrame:
         return df.rename(columns={self.__date_column:'index'}).set_index('index')
 
     def __getFormattedString(self, sum_value: float, count_value: int) -> str:

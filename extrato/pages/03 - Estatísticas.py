@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 
 from extrato.lib.extrato_columns import ExtratoDBColumns
@@ -20,7 +21,7 @@ class ExtratoAssetsInfo:
             self.__columns_object._buy_price_col.getName(),
         )
         
-    def setDataframe(self, dataframe):
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
         self.__statistics.setDataframe(dataframe)
     
     def showInfo(self) -> None:
@@ -51,7 +52,7 @@ class ExtratoEarnsCostsInfo:
             self.__columns_object._total_costs_col.getName(),
         )
         
-    def setDataframe(self, dataframe):
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
         self.__statistics.setDataframe(dataframe)
     
     def showInfo(self) -> None:
@@ -79,7 +80,7 @@ class ExtratoStatisticsGUI:
         self.__assets_info.setDataframe(self.__side_bar.getFilteredDataframe())
         self.__earns_costs_info.setDataframe(self.__side_bar.getFilteredDataframe())
 
-    def setDataframe(self, file) -> None:
+    def setDataframe(self, file: str) -> None:
         self.__side_bar.updateDataframe(file)
         self.__setDataframes()
         self.__assets_info.showInfo()

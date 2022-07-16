@@ -26,7 +26,37 @@ class ExtratoRawKit(ExtratoDataframesKitInterface):
         super().__init__(self.__columns_object)
 
 
-class ExtratoDBKit(ExtratoDataframesKitInterface):
+class ExtratoDBKitInterface(DataframesKitInterface):
+    def __init__(self, columns_object: ExtratoDBColumns) -> None:
+        """Structure to handle a Pandas dataframe based on Extrato Database.
+        
+        Args:
+        - columns_object: any object instance inherited from 'ExtratoDBColumns'
+        """
+        self.__columns_object = columns_object
+        super().__init__(self.__columns_object)
+
+    def sumTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
+        """Sum the 'col_A' and 'col_B' to put the result in the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[col_A] + self._raw_df[col_B]
+
+    def multiplyTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
+        """Multiply the 'col_A' and 'col_B' to put the result in the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[col_A] * self._raw_df[col_B]
+
+    def copyColumnToColumn(self, target_col: str, result_col: str) -> None:
+        """Copy the 'target_col' data to the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[target_col]
+
+    def replaceAllValuesInColumnExcept(self, target_col: str, target_val, except_col: str, except_val) -> None:
+        """Put the 'target_val' in all cells of the 'target_col'.
+        
+        The exception case occurrs in the line when the 'except_val' is found in the 'except_col'.
+        """
+        self._raw_df[target_col] = self._raw_df[target_col].where(self._raw_df[except_col] == except_val, target_val)
+
+
+class ExtratoDBKit(ExtratoDBKitInterface):
     def __init__(self) -> None:
         """Structure to handle a Pandas dataframe based on Extrato Database."""
         self.__columns_object = ExtratoDBColumns()
@@ -69,7 +99,7 @@ class ExtratoDBKit(ExtratoDataframesKitInterface):
             self.__columns_object._total_earnings_col.getName(),
         )
 
-    def __copyTotalPriceToColumn(self, operation_name: str, operation_col_name) -> None:
+    def __copyTotalPriceToColumn(self, operation_name: str, operation_col_name: str) -> None:
         # Copy the 'Total Price' data to the column 'operation_col_name', where:
         # - the 'Operation' is equal to 'operation_name'
         # - replace values in other conditions to 0 or NaN
@@ -169,33 +199,6 @@ class ExtratoDBKit(ExtratoDataframesKitInterface):
                 checked_rows += 1
                 if (buy_ticker_quantity == sell_ticker_quantity) or (checked_rows == df_filter_by_ticker_max_rows):
                     slice_index += 1
-
-    def getNonDuplicatedListFromColumn(self, target_col: str, dropna=True):
-        """Return a non-duplicated values list from a given column."""
-        df_column = self._raw_df[[target_col]].copy()
-        if dropna:
-            df_column.dropna()
-        df_column = df_column.drop_duplicates()
-        return df_column[target_col].to_list()
-
-    def sumTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
-        """Sum the 'col_A' and 'col_B' to put the result in the 'result_col'."""
-        self._raw_df[result_col] = self._raw_df[col_A] + self._raw_df[col_B]
-
-    def multiplyTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
-        """Multiply the 'col_A' and 'col_B' to put the result in the 'result_col'."""
-        self._raw_df[result_col] = self._raw_df[col_A] * self._raw_df[col_B]
-
-    def copyColumnToColumn(self, target_col: str, result_col: str) -> None:
-        """Copy the 'target_col' data to the 'result_col'."""
-        self._raw_df[result_col] = self._raw_df[target_col]
-
-    def replaceAllValuesInColumnExcept(self, target_col: str, target_val, except_col: str, except_val) -> None:
-        """Put the 'target_val' in all cells of the 'target_col'.
-        
-        The exception case occurrs in the line when the 'except_val' is found in the 'except_col'.
-        """
-        self._raw_df[target_col] = self._raw_df[target_col].where(self._raw_df[except_col] == except_val, target_val)
 
     def readExcelFile(self, file) -> None:
         """Method Inherited from 'ExtratoDataframesKitInterface' class."""

@@ -32,19 +32,19 @@ class ExtratoGuiLocal:
             value = folder_path_default,
         )
 
-    def __showFileSelector(self):
+    def __showFileSelector(self) -> None:
         filenames = [file for file in os.listdir(self.folder_path) if file.endswith((".xls", ".xlsx"))]
         selected_filename = st.selectbox('Selecione o arquivo Extrato: ', filenames)
         self.file_path = os.path.join(self.folder_path, selected_filename)
 
-    def __showSelectedFile(self):
+    def __showSelectedFile(self) -> None:
         st.write('Planilha atual: ', st.session_state.extrato_file)
 
-    def __showUpdateFileButton(self):
+    def __showUpdateFileButton(self) -> None:
         if st.button("Selecionar"):
             self.__updateExtratoFile()
 
-    def __updateExtratoFile(self):
+    def __updateExtratoFile(self) -> None:
         if os.path.isfile(self.file_path):
             if self.file_path != st.session_state.extrato_file:
                 self.file_manager.setExtratoFile(self.file_path)
@@ -52,7 +52,7 @@ class ExtratoGuiLocal:
                 st.session_state.extrato_file = self.file_manager.getExtratoFile()
                 self.__showBadBehaviorInfo()
 
-    def __showBadBehaviorInfo(self):
+    def __showBadBehaviorInfo(self) -> None:
         st.write('Planilha selecionada: ', st.session_state.extrato_file)
         st.markdown(
             """

@@ -11,7 +11,7 @@ class SingleFormatter:
         """Structure used to format values to perform 'nice visualization'."""
         self.__setFormatterLocalParameters()
 
-    def __setFormatterLocalParameters(self):
+    def __setFormatterLocalParameters(self) -> None:
         locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
 
     def getMoneyString(self, value: str) -> str:
@@ -108,14 +108,14 @@ class DataframesKitInterface:
         self._raw_df = pd.DataFrame(columns=self.__columns_object.getColumnsNameList())
         self.formatDataframes()
 
-    def addColumnIfNotExists(self, dataframe):
+    def addColumnIfNotExists(self, dataframe) -> pd.DataFrame:
         # Create the column witn NaN values
         for column, raw_column_obj in self.__columns_object.getRawColumnsDict().items():
             if column not in dataframe.columns:
                 dataframe[column] = np.nan
         return dataframe
 
-    def formatDataframes(self):
+    def formatDataframes(self) -> None:
         self.__kit_formatter.formatDataframes(self._raw_df)
 
     def readExcelFile(self, file) -> None:
@@ -130,3 +130,11 @@ class DataframesKitInterface:
     
     def getFormattedDataframe(self) -> pd.DataFrame:
         return self.__kit_formatter.getFormattedDataframe()
+
+    def getNonDuplicatedListFromColumn(self, target_col: str, dropna=True) -> list:
+        """Return a non-duplicated values list from a given column."""
+        df_column = self._raw_df[[target_col]].copy()
+        if dropna:
+            df_column.dropna()
+        df_column = df_column.drop_duplicates()
+        return df_column[target_col].to_list()

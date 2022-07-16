@@ -80,7 +80,7 @@ class ExtratoSideBarInterface:
         if self.__period_filter:
             self.__showPeriodFilter()
     
-    def updateDataframe(self, file) -> None:
+    def updateDataframe(self, file: str) -> None:
         self.__filter_object.updateDataframe(file)
         self.__showSideBar()
     

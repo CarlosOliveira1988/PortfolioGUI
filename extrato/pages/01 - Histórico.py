@@ -16,10 +16,10 @@ class ExtratoRawTableInfo:
     def __showDataframe(self) -> None:
         st.write("", self.__filtered_fmtdf.astype(str))
 
-    def setDataframe(self, dataframe: pd.DataFrame):
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
         self.__filtered_fmtdf = dataframe
     
-    def showInfo(self):
+    def showInfo(self) -> None:
         self.__showMainTitle()
         self.__showDataframe()
 
@@ -34,7 +34,7 @@ class ExtratoHistoryGUI:
     def __setDataframes(self) -> None:
         self.__table.setDataframe(self.__side_bar.getFilteredFormattedDataframe())
 
-    def setDataframe(self, file) -> None:
+    def setDataframe(self, file: str) -> None:
         self.__side_bar.updateDataframe(file)
         self.__setDataframes()
         self.__table.showInfo()
