@@ -4,7 +4,7 @@ import pandas as pd
 from common.dataframes_kit import DataframesKitInterface, DataframesDBKitInterface
 
 from extrato.lib.extrato_columns import (
-    ExtratoOperations, ExtratoColumnsInterface, ExtratoRawColumns, ExtratoDBColumns
+    ExtratoOperations, ExtratoColumnsInterface, ExtratoRawColumns, ExtratoDBColumns, InvestmentPositionType
 )
 
 
@@ -44,6 +44,7 @@ class ExtratoDBKit(DataframesDBKitInterface):
         self.__setBuyPriceColumn()
         self.__setSellPriceColumn()
         self.__setSliceIndexColumn()
+        self.__setSliceTypeColumn()
 
     def __setTotalPriceColumn(self) -> None:
         # 'Total Price' = 'Quantity' * 'Unit Price'
@@ -133,8 +134,6 @@ class ExtratoDBKit(DataframesDBKitInterface):
         
         # Non-duplicated ticker list
         unique_ticker_list = self.getNonDuplicatedListFromColumn(ticker_col)
-        if unique_ticker_list:
-            unique_ticker_list.sort()
         
         # Prepare the dataframe
         df = self._raw_df.copy()
@@ -170,8 +169,44 @@ class ExtratoDBKit(DataframesDBKitInterface):
                 if (buy_ticker_quantity == sell_ticker_quantity) or (checked_rows == df_filter_by_ticker_max_rows):
                     slice_index += 1
 
+    def __setSliceTypeColumn(self) -> None:
+        # Column variables    
+        slice_index_col = self.__columns_object._slice_index_col.getName()
+        slice_type_col = self.__columns_object._slice_type_col.getName()
+        quantity_col = self.__columns_object._quantity_col.getName()
+        operation_col = self.__columns_object._operation_col.getName()
+        
+        # Operation variables
+        buy_operation = self.__operations_object.getBuyOperation()
+        sell_operation = self.__operations_object.getSellOperation()
+        
+        # Position variables
+        position_type = InvestmentPositionType()
+        closed_position = position_type.getClosedPosition()
+        opened_position = position_type.getOpenedPosition()
+        
+        # Iterate over the slices
+        slice_index_list = self.getNonDuplicatedListFromColumn(slice_index_col)
+        for slice_index in slice_index_list:
+            
+            df_filtered_by_slice_index = self._raw_df.loc[self._raw_df[slice_index_col].isin([slice_index])]
+            
+            df_filtered_by_buy = df_filtered_by_slice_index.loc[df_filtered_by_slice_index[operation_col].isin([buy_operation])]
+            buy_ticker_quantity = df_filtered_by_buy[quantity_col].sum()
+            
+            df_filtered_by_sell = df_filtered_by_slice_index.loc[df_filtered_by_slice_index[operation_col].isin([sell_operation])]
+            sell_ticker_quantity = df_filtered_by_sell[quantity_col].sum()
+            
+            if buy_ticker_quantity == sell_ticker_quantity:
+                self._raw_df.loc[self._raw_df[slice_index_col] == slice_index, [slice_type_col]] = closed_position
+            else:
+                self._raw_df.loc[self._raw_df[slice_index_col] == slice_index, [slice_type_col]] = opened_position
+
     def readExcelFile(self, file) -> None:
-        """Method Inherited from 'ExtratoDataframesKitInterface' class."""
+        """Method Overridden from 'ExtratoDataframesKitInterface' class."""
         self._raw_df = self.addColumnIfNotExists(pd.read_excel(file))
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()
+
+    def getColumnsObject(self) -> ExtratoDBColumns:
+        return self.__columns_object

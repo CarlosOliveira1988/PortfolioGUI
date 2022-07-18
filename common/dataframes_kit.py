@@ -131,13 +131,21 @@ class DataframesKitInterface:
     def getFormattedDataframe(self) -> pd.DataFrame:
         return self.__kit_formatter.getFormattedDataframe()
 
-    def getNonDuplicatedListFromColumn(self, target_col: str, dropna=True) -> list:
+    def getNonDuplicatedListFromColumn(self, target_col: str, dropna=True, sorted=True) -> list:
         """Return a non-duplicated values list from a given column."""
         df_column = self._raw_df[[target_col]].copy()
+        
         if dropna:
-            df_column.dropna()
+            df_column = df_column.dropna()
+        
         df_column = df_column.drop_duplicates()
-        return df_column[target_col].to_list()
+        df_column_list = df_column[target_col].to_list()
+        
+        if sorted:
+            if df_column_list:
+                df_column_list.sort()
+        
+        return df_column_list
 
 
 class DataframesDBKitInterface(DataframesKitInterface):

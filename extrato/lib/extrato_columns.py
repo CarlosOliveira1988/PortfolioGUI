@@ -47,6 +47,27 @@ class ExtratoOperations:
         return self.__charge
 
 
+class InvestmentPositionType:
+    def __init__(self) -> None:
+        """Structure to define possible values for the investment positions."""
+        self.__positions_list = []
+        self.__closed_position = self.__addInvestmentPosition("Posição encerrada")
+        self.__opened_position = self.__addInvestmentPosition("Posição em aberto")
+
+    def __addInvestmentPosition(self, position_string: str) -> str:
+        self.__positions_list.append(position_string)
+        return position_string
+
+    def getPositionsList(self) -> list:
+        return self.__positions_list.copy()
+
+    def getClosedPosition(self) -> str:
+        return self.__closed_position
+
+    def getOpenedPosition(self) -> str:
+        return self.__opened_position
+
+
 class ExtratoColumnsInterface(ColumnsInterface):
     def __init__(self) -> None:
         """Structure to define an interface of 'Extrato' columns."""
@@ -121,4 +142,5 @@ class ExtratoDBColumns(ExtratoColumnsInterface):
         self._sell_price_col = self.addRawColumn("Venda", "$")
 
         # Slice columns
-        self._slice_index_col = self.addRawColumn("Slice Index", "number")
+        self._slice_index_col = self.addRawColumn("Posição", "number")
+        self._slice_type_col = self.addRawColumn("Tipo", "string")
