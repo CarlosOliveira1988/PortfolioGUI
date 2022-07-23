@@ -17,16 +17,17 @@ class ClosedPositionDBColumns(ColumnsInterface):
         # Columns for Ticker classification
         self._market_col = self.addRawColumn("Mercado", "string")
         self._ticker_col = self.addRawColumn("Ticker", "string")
-        self._index_position_col = self.addRawColumn("Posição Encerrada", "number")
-
-        # Columns for Ticker comparison
         self._indexer_col = self.addRawColumn("Indexador", "string")
-        self._yield_col = self.addRawColumn("Yield", "%")
-        self._adjusted_yield_col = self.addRawColumn("Yield Ajustado", "%")
 
-        # Total period
+        # Columns for Yield comparison
+        self._yield_min_col = self.addRawColumn("Yield Mínimo", "%")
+        self._yield_max_col = self.addRawColumn("Yield Máximo", "%")
+
+        # Dates
         self._initial_date_col = self.addRawColumn("Data Inicial", "date")
         self._final_date_col = self.addRawColumn("Data Final", "date")
+
+        # Total period
         self._length_in_days_col = self.addRawColumn("Dias", "number")
         self._length_in_months_col = self.addRawColumn("Meses", "number")
 
