@@ -1,5 +1,6 @@
 import pandas as pd
 
+from extrato.lib.extrato_columns import ExtratoOperations
 from extrato.lib.extrato_dataframes_kit import DataframesDBKitInterface, ExtratoDBKit
 
 from positions.lib.closed_columns import ClosedPositionDBColumns
@@ -12,6 +13,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         super().__init__(self.__columns_object)
         
         self.__extrato_kit_object = ExtratoDBKit()
+        self.__operations_object = ExtratoOperations()
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()
 
@@ -89,6 +91,88 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             )
         )
 
+    def __setBuyColumns(self, slice_index: int, data_list: list, column_name_list: list) -> None:
+        # Quantity
+        column_name_list.append(self.__columns_object._quantity_buy_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._quantity_col,
+                self.__operations_object.getBuyOperation(),
+            )
+        )
+        
+        # Total Price
+        column_name_list.append(self.__columns_object._total_buy_price_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._buy_price_col,
+                self.__operations_object.getBuyOperation(),
+            )
+        )
+        
+        # IR
+        column_name_list.append(self.__columns_object._IR_buy_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._IR_col,
+                self.__operations_object.getBuyOperation(),
+            )
+        )
+        
+        # Taxes
+        column_name_list.append(self.__columns_object._taxes_buy_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._taxes_col,
+                self.__operations_object.getBuyOperation(),
+            )
+        )
+    
+    def __setSellColumns(self, slice_index: int, data_list: list, column_name_list: list) -> None:
+        # Quantity
+        column_name_list.append(self.__columns_object._quantity_sell_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._quantity_col,
+                self.__operations_object.getSellOperation(),
+            )
+        )
+        
+        # Total Price
+        column_name_list.append(self.__columns_object._total_sell_price_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._sell_price_col,
+                self.__operations_object.getSellOperation(),
+            )
+        )
+        
+        # IR
+        column_name_list.append(self.__columns_object._IR_sell_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._IR_col,
+                self.__operations_object.getSellOperation(),
+            )
+        )
+        
+        # Taxes
+        column_name_list.append(self.__columns_object._taxes_sell_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._taxes_col,
+                self.__operations_object.getSellOperation(),
+            )
+        )
+
     def __appendNewDataLine(self, data_list: list, column_name_list: list) -> None:
         df = pd.DataFrame(columns=column_name_list)
         df = df.append(dict(zip(df.columns, data_list)), ignore_index=True)
@@ -96,6 +180,8 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
 
     def __addValuesToCalculatedColumns(self) -> None:
         extrato_df_slice_list = self.__extrato_kit_object.getExtratoSliceList()
+        
+        # Values calculated 'row-by-row'
         for slice_index in extrato_df_slice_list:
             if self.__extrato_kit_object.isClosedPositionSliceType(slice_index):
                 data_list = []
@@ -103,7 +189,13 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
                 self.__setTickerClassificationColumns(slice_index, data_list, column_name_list)
                 self.__setYieldColumns(slice_index, data_list, column_name_list)
                 self.__setDateColumns(slice_index, data_list, column_name_list)
-                self.__appendNewDataLine(data_list, column_name_list)
+                self.__setBuyColumns(slice_index, data_list, column_name_list)
+                self.__setSellColumns(slice_index, data_list, column_name_list)
+                self.__appendNewDataLine(data_list, column_name_list)        
+        
+        # Values calculated 'col-to-col'
+        # Add the methods
+        
         self._raw_df.reset_index(drop=True, inplace=True)
 
     def readExcelFile(self, file) -> None:

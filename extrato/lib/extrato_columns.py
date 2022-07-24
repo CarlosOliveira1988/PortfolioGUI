@@ -28,6 +28,11 @@ class ExtratoOperations:
     def getSecondaryOperationsList(self) -> list:
         return self.__sec_operations_list.copy()
     
+    def getOperationsList(self) -> list:
+        operations_list = self.getMainOperationsList()
+        operations_list.extend(self.getSecondaryOperationsList())
+        return operations_list.copy()
+    
     def getBuyOperation(self) -> str:
         return self.__buy
     

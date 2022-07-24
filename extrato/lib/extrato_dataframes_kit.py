@@ -252,6 +252,16 @@ class ExtratoDBKit(DataframesDBKitInterface):
         only_buy_operation=True,
         minimum_value_flag=True,
     ):
+        """Return a minimum/maximum value from the 'sliced dataframe'.
+        
+        This method is useful to get data such as Prices, Yield and other number's cells.
+        
+        If 'minimum_value_flag==True': return the minimum value in the given column.
+        If 'minimum_value_flag==False': return the maximum value in the given column.
+        
+        If 'only_buy_operation==True': consider only lines with the tag 'buy'
+        If 'only_buy_operation==False': consider all lines of the 'sliced dataframe'
+        """
         extrato_df_filtered = self.getFilteredSliceExtrato(slice_index)
 
         # Filter per Buy Operation
@@ -270,6 +280,29 @@ class ExtratoDBKit(DataframesDBKitInterface):
         else:
             return 0
 
+    def getSumValueFromExtratoSlice(
+        self,
+        slice_index: int,
+        extrato_raw_column_obj: RawColumn,
+        operation_type: str,
+    ):
+        """Return the sum value from the 'sliced dataframe'.
+        
+        This method is useful to get the sum of columns such as Prices, Taxes and other related.
+        
+        The 'operation_type (str)' is any operation string related to the 'ExtratoOperations' class.
+        """
+        extrato_df_filtered = self.getFilteredSliceExtrato(slice_index)
+
+        # Filter per Operation type
+        if operation_type in self.__operations_object.getOperationsList():
+            operation_col = self.__columns_object._operation_col.getName()
+            extrato_df_filtered = extrato_df_filtered.loc[extrato_df_filtered[operation_col].isin([operation_type])]
+        else:
+            msg = "The " + str(operation_type) + " is not a valid operation type. See the ExtratoOperations class."
+            raise ValueError(msg)
+
+        return sum(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
 
     def readExcelFile(self, file) -> None:
         """Method Overridden from 'ExtratoDataframesKitInterface' class."""

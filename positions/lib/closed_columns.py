@@ -6,8 +6,6 @@ class ClosedPositionDBColumns(ColumnsInterface):
         """Structure to define all columns related to 'Closed Position Database'.
         
         'Closed Position' means an interval of 'buy' and 'sell' operations that:
-        - 'buy_value.sum()' and 'buy_quantity.sum()' are considered 'negative' values
-        - 'sell_value.sum()' and 'sell_quantity.sum()' are considered 'positive' values
         - 'closed position' occurrs when 'buy_quantity.sum()' + 'sell_quantity.sum()' is equal to 0
         
         All values related to the 'Closed Position' are registered in the User Extrato spreadsheet.
@@ -15,37 +13,37 @@ class ClosedPositionDBColumns(ColumnsInterface):
         super().__init__()
 
         # Columns for Ticker classification
-        self._market_col = self.addRawColumn("Mercado", "string")
-        self._ticker_col = self.addRawColumn("Ticker", "string")
-        self._indexer_col = self.addRawColumn("Indexador", "string")
+        self._market_col = self.addRawColumn("Mercado", "string") # row-by-row
+        self._ticker_col = self.addRawColumn("Ticker", "string") # row-by-row
+        self._indexer_col = self.addRawColumn("Indexador", "string") # row-by-row
 
         # Columns for Yield comparison
-        self._yield_min_col = self.addRawColumn("Yield Mínimo", "%")
-        self._yield_max_col = self.addRawColumn("Yield Máximo", "%")
+        self._yield_min_col = self.addRawColumn("Yield Mínimo", "%") # row-by-row
+        self._yield_max_col = self.addRawColumn("Yield Máximo", "%") # row-by-row
 
         # Dates
-        self._initial_date_col = self.addRawColumn("Data Inicial", "date")
-        self._final_date_col = self.addRawColumn("Data Final", "date")
+        self._initial_date_col = self.addRawColumn("Data Inicial", "date") # row-by-row
+        self._final_date_col = self.addRawColumn("Data Final", "date") # row-by-row
 
         # Total period
-        self._length_in_days_col = self.addRawColumn("Dias", "number")
-        self._length_in_months_col = self.addRawColumn("Meses", "number")
+        self._length_in_days_col = self.addRawColumn("Dias", "number") # col-to-col
+        self._length_in_months_col = self.addRawColumn("Meses", "number") # col-to-col
 
         # Buy data
-        self._quantity_buy_col = self.addRawColumn("Quantidade Compra", "number")
-        self._mean_buy_price_col = self.addRawColumn("Preço Médio Compra", "$")
-        self._taxes_buy_col = self.addRawColumn("Taxas Compra", "$")
-        self._IR_buy_col = self.addRawColumn("IR Compra", "$")
-        self._mean_tax_buy_price_col = self.addRawColumn("Preço Médio Compra [taxas]", "$")
-        self._total_buy_price_col = self.addRawColumn("Preço Total Compra", "$")
+        self._quantity_buy_col = self.addRawColumn("Quantidade Compra", "number") # row-by-row
+        self._mean_buy_price_col = self.addRawColumn("Preço Médio Compra", "$") # col-to-col
+        self._taxes_buy_col = self.addRawColumn("Taxas Compra", "$") # row-by-row
+        self._IR_buy_col = self.addRawColumn("IR Compra", "$") # row-by-row
+        self._mean_tax_buy_price_col = self.addRawColumn("Preço Médio Compra [taxas]", "$") # col-to-col
+        self._total_buy_price_col = self.addRawColumn("Preço Total Compra", "$") # row-by-row
 
         # Sell data
-        self._quantity_sell_col = self.addRawColumn("Quantidade Venda", "number")
-        self._mean_sell_price_col = self.addRawColumn("Preço Médio Venda", "$")
-        self._taxes_sell_col = self.addRawColumn("Taxas Venda", "$")
-        self._IR_sell_col = self.addRawColumn("IR Venda", "$")
-        self._mean_tax_sell_price_col = self.addRawColumn("Preço Médio Venda [taxas]", "$")
-        self._total_sell_price_col = self.addRawColumn("Preço Total Venda", "$")
+        self._quantity_sell_col = self.addRawColumn("Quantidade Venda", "number") # row-by-row
+        self._mean_sell_price_col = self.addRawColumn("Preço Médio Venda", "$") # col-to-col
+        self._taxes_sell_col = self.addRawColumn("Taxas Venda", "$") # row-by-row
+        self._IR_sell_col = self.addRawColumn("IR Venda", "$") # row-by-row
+        self._mean_tax_sell_price_col = self.addRawColumn("Preço Médio Venda [taxas]", "$") # col-to-col
+        self._total_sell_price_col = self.addRawColumn("Preço Total Venda", "$") # row-by-row
 
         # Other related taxes during the period
         self._additional_taxes_col = self.addRawColumn("Taxas Adicionais", "$") # Excluding buy and sell taxes
