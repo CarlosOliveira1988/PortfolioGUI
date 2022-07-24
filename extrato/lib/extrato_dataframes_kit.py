@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from common.dataframes_kit import DataframesKitInterface, DataframesDBKitInterface
+from common.raw_column import RawColumn
 
 from extrato.lib.extrato_columns import (
     ExtratoOperations, ExtratoColumnsInterface, ExtratoRawColumns, ExtratoDBColumns, InvestmentPositionType
@@ -29,6 +30,7 @@ class ExtratoRawKit(ExtratoDataframesKitInterface):
 class ExtratoDBKit(DataframesDBKitInterface):
     def __init__(self) -> None:
         """Structure to handle a Pandas dataframe based on Extrato Database."""
+        self.__postitions_type = InvestmentPositionType()
         self.__columns_object = ExtratoDBColumns()
         super().__init__(self.__columns_object)
         self.__addValuesToCalculatedColumns()
@@ -201,6 +203,73 @@ class ExtratoDBKit(DataframesDBKitInterface):
                 self._raw_df.loc[self._raw_df[slice_index_col] == slice_index, [slice_type_col]] = closed_position
             else:
                 self._raw_df.loc[self._raw_df[slice_index_col] == slice_index, [slice_type_col]] = opened_position
+
+
+    def getFilteredSliceExtrato(self, slice_index: int) -> pd.DataFrame:
+        """Return a filtered dataframe per slice index: 'sliced dataframe'."""
+        extrato_df = self.getNotNanDataframe()
+        extrato_df_slice_index_col = self.__columns_object._slice_index_col.getName()
+        return extrato_df.loc[extrato_df[extrato_df_slice_index_col].isin([slice_index])]
+
+    def isClosedPositionSliceType(self, slice_index: int) -> bool:
+        """Check if the specified 'sliced dataframe' is related to Closed Positions."""
+        extrato_df_filtered_by_slice = self.getFilteredSliceExtrato(slice_index)
+        extrato_df_slice_type_col = self.__columns_object._slice_type_col.getName()
+        closed_position = self.__postitions_type.getClosedPosition()
+        return not extrato_df_filtered_by_slice.loc[
+            extrato_df_filtered_by_slice[extrato_df_slice_type_col].isin([closed_position])
+        ].empty
+
+    def getExtratoSliceList(self) -> list:
+        """Return a list of all slice indexes."""
+        return self.getNonDuplicatedListFromColumn(self.__columns_object._slice_index_col.getName())
+
+    def getUniqueValueFromExtratoSlice(
+        self,
+        slice_index: int,
+        extrato_raw_column_obj: RawColumn,
+        first_line_value=True,
+    ):
+        """Return an unique value from the 'sliced dataframe'.
+        
+        This method is useful to get information such as Ticker, Market and other repeated data cells.
+        
+        If 'first_line_value==True': return the value from the first line
+        
+        If 'first_line_value==False': return the value from the last line
+        """
+        extrato_df_filtered = self.getFilteredSliceExtrato(slice_index)
+        extrato_column_value_list = extrato_df_filtered[extrato_raw_column_obj.getName()].to_list()
+        if first_line_value:
+            return extrato_column_value_list[0]
+        else:
+            return extrato_column_value_list[-1]
+
+    def getMinMaxValueFromExtratoSlice(
+        self,
+        slice_index: int,
+        extrato_raw_column_obj: RawColumn,
+        only_buy_operation=True,
+        minimum_value_flag=True,
+    ):
+        extrato_df_filtered = self.getFilteredSliceExtrato(slice_index)
+
+        # Filter per Buy Operation
+        if only_buy_operation:
+            buy_operation = self.__operations_object.getBuyOperation()
+            operation_col = self.__columns_object._operation_col.getName()
+            extrato_df_filtered = extrato_df_filtered.loc[extrato_df_filtered[operation_col].isin([buy_operation])]
+
+        extrato_col_data_list = extrato_df_filtered[extrato_raw_column_obj.getName()].to_list()
+        if extrato_col_data_list:
+            # Return Minimum/Maximum value
+            if minimum_value_flag:
+                return min(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
+            else:
+                return max(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
+        else:
+            return 0
+
 
     def readExcelFile(self, file) -> None:
         """Method Overridden from 'ExtratoDataframesKitInterface' class."""
