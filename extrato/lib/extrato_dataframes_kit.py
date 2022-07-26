@@ -117,6 +117,7 @@ class ExtratoDBKit(DataframesDBKitInterface):
             self.__columns_object._sell_price_col.getName(),
         )
 
+
     def __setSliceIndexColumn(self) -> None:
         # Run row-per-row in order to find 'slices'.
         # Slices are group of lines to create an 'Opened Position' or 'Closed Position'
@@ -304,11 +305,13 @@ class ExtratoDBKit(DataframesDBKitInterface):
 
         return sum(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
 
+
     def readExcelFile(self, file) -> None:
         """Method Overridden from 'ExtratoDataframesKitInterface' class."""
         self._raw_df = self.addColumnIfNotExists(pd.read_excel(file))
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()
+
 
     def getColumnsObject(self) -> ExtratoDBColumns:
         return self.__columns_object

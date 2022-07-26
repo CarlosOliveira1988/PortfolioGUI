@@ -162,9 +162,19 @@ class DataframesDBKitInterface(DataframesKitInterface):
         """Sum the 'col_A' and 'col_B' to put the result in the 'result_col'."""
         self._raw_df[result_col] = self._raw_df[col_A] + self._raw_df[col_B]
 
+    def sumColumnsList(self, col_list: list, result_col: str) -> None:
+        """Sum all columns in the 'col_list' and put the result in the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[col_list].sum(axis=1)
+
     def multiplyTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
         """Multiply the 'col_A' and 'col_B' to put the result in the 'result_col'."""
         self._raw_df[result_col] = self._raw_df[col_A] * self._raw_df[col_B]
+
+    def divideTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
+        """Divide the 'col_A' per the 'col_B' and put the result in the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[col_A].div(
+            self._raw_df[col_B].where(self._raw_df[col_B] != 0, np.nan)
+        )
 
     def copyColumnToColumn(self, target_col: str, result_col: str) -> None:
         """Copy the 'target_col' data to the 'result_col'."""
@@ -175,4 +185,6 @@ class DataframesDBKitInterface(DataframesKitInterface):
         
         The exception case occurrs in the line when the 'except_val' is found in the 'except_col'.
         """
-        self._raw_df[target_col] = self._raw_df[target_col].where(self._raw_df[except_col] == except_val, target_val)
+        self._raw_df[target_col] = self._raw_df[target_col].where(
+            self._raw_df[except_col] == except_val, target_val
+        )

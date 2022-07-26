@@ -32,18 +32,20 @@ class ClosedPositionDBColumns(ColumnsInterface):
         # Buy data
         self._quantity_buy_col = self.addRawColumn("Quantidade Compra", "number") # row-by-row
         self._mean_buy_price_col = self.addRawColumn("Preço Médio Compra", "$") # col-to-col
+        self._total_buy_price_col = self.addRawColumn("Preço Total Compra", "$") # row-by-row
         self._taxes_buy_col = self.addRawColumn("Taxas Compra", "$") # row-by-row
         self._IR_buy_col = self.addRawColumn("IR Compra", "$") # row-by-row
-        self._mean_tax_buy_price_col = self.addRawColumn("Preço Médio Compra [taxas]", "$") # col-to-col
-        self._total_buy_price_col = self.addRawColumn("Preço Total Compra", "$") # row-by-row
+        self._mean_costs_buy_price_col = self.addRawColumn("Preço Médio Compra [taxas]", "$") # col-to-col
+        self._total_costs_buy_price_col = self.addRawColumn("Preço Total Compra [taxas]", "$") # col-to-col
 
         # Sell data
         self._quantity_sell_col = self.addRawColumn("Quantidade Venda", "number") # row-by-row
         self._mean_sell_price_col = self.addRawColumn("Preço Médio Venda", "$") # col-to-col
+        self._total_sell_price_col = self.addRawColumn("Preço Total Venda", "$") # row-by-row
         self._taxes_sell_col = self.addRawColumn("Taxas Venda", "$") # row-by-row
         self._IR_sell_col = self.addRawColumn("IR Venda", "$") # row-by-row
-        self._mean_tax_sell_price_col = self.addRawColumn("Preço Médio Venda [taxas]", "$") # col-to-col
-        self._total_sell_price_col = self.addRawColumn("Preço Total Venda", "$") # row-by-row
+        self._mean_costs_sell_price_col = self.addRawColumn("Preço Médio Venda [taxas]", "$") # col-to-col
+        self._total_costs_sell_price_col = self.addRawColumn("Preço Total Venda [taxas]", "$") # col-to-col
 
         # Other related taxes during the period
         self._additional_taxes_col = self.addRawColumn("Taxas Adicionais", "$") # Excluding buy and sell taxes
