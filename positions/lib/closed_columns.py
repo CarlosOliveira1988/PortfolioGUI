@@ -35,6 +35,7 @@ class ClosedPositionDBColumns(ColumnsInterface):
         self._total_buy_price_col = self.addRawColumn("Preço Total[C]", "$") # row-by-row
         self._taxes_buy_col = self.addRawColumn("Taxas[C]", "$") # row-by-row
         self._IR_buy_col = self.addRawColumn("IR[C]", "$") # row-by-row
+        self._costs_buy_col = self.addRawColumn("Custos[C]", "$") # col-to-col
         self._mean_costs_buy_price_col = self.addRawColumn("Preço Médio c/ Custos[C]", "$") # col-to-col
         self._total_costs_buy_price_col = self.addRawColumn("Preço Total c/ Custos[C]", "$") # col-to-col
 
@@ -44,6 +45,7 @@ class ClosedPositionDBColumns(ColumnsInterface):
         self._total_sell_price_col = self.addRawColumn("Preço Total[V]", "$") # row-by-row
         self._taxes_sell_col = self.addRawColumn("Taxas[V]", "$") # row-by-row
         self._IR_sell_col = self.addRawColumn("IR[V]", "$") # row-by-row
+        self._costs_sell_col = self.addRawColumn("Custos[V]", "$") # col-to-col
         self._mean_costs_sell_price_col = self.addRawColumn("Preço Médio c/ Custos[V]", "$") # col-to-col
         self._total_costs_sell_price_col = self.addRawColumn("Preço Total c/ Custos[V]", "$") # col-to-col
 

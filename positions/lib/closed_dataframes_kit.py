@@ -179,11 +179,44 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             )
         )
 
+    def __setTotalCostsColumns(self, slice_index: int, data_list: list, column_name_list: list) -> None:
+        # Total taxes
+        column_name_list.append(self.__columns_object._total_taxes_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._taxes_col,
+            )
+        )
+
+        # Total IR
+        column_name_list.append(self.__columns_object._total_IR_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._IR_col,
+            )
+        )
+
     def __appendNewDataLine(self, data_list: list, column_name_list: list) -> None:
         df = pd.DataFrame(columns=column_name_list)
         df = df.append(dict(zip(df.columns, data_list)), ignore_index=True)
         self._raw_df = pd.concat([self._raw_df, df])
 
+
+    def __setBuyCosts(self):
+        self.sumTwoColumns(
+            self.__columns_object._taxes_buy_col.getName(),
+            self.__columns_object._IR_buy_col.getName(),
+            self.__columns_object._costs_buy_col.getName(),
+        )
+
+    def __setSellCosts(self):
+        self.sumTwoColumns(
+            self.__columns_object._taxes_sell_col.getName(),
+            self.__columns_object._IR_sell_col.getName(),
+            self.__columns_object._costs_sell_col.getName(),
+        )
 
     def __setMeanBuyPrice(self):
         # Mean Buy
@@ -194,12 +227,9 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         )
         
         # Buy + costs: the costs rises the 'buy price'
-        self.sumColumnsList(
-            [
-                self.__columns_object._total_buy_price_col.getName(),
-                self.__columns_object._taxes_buy_col.getName(),
-                self.__columns_object._IR_buy_col.getName(),
-            ],
+        self.sumTwoColumns(
+            self.__columns_object._total_buy_price_col.getName(),
+            self.__columns_object._costs_buy_col.getName(),
             self.__columns_object._total_costs_buy_price_col.getName(),
         )
         
@@ -219,16 +249,9 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         )
         
         # Sell + costs: the costs reduces the 'sell price'
-        self.sumColumnsList(
-            [
-                self.__columns_object._taxes_sell_col.getName(),
-                self.__columns_object._IR_sell_col.getName(),
-            ],
-            self.__columns_object._total_costs_sell_price_col.getName(), # temp column to save the costs
-        )
         self.subtractTwoColumns(
             self.__columns_object._total_sell_price_col.getName(),
-            self.__columns_object._total_costs_sell_price_col.getName(),
+            self.__columns_object._costs_sell_col.getName(),
             self.__columns_object._total_costs_sell_price_col.getName(),
         )
         
@@ -237,6 +260,42 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._total_costs_sell_price_col.getName(),
             self.__columns_object._quantity_sell_col.getName(),
             self.__columns_object._mean_costs_sell_price_col.getName(),
+        )
+
+    def __setOtherCosts(self):
+        # Total costs
+        self.sumTwoColumns(
+            self.__columns_object._total_taxes_col.getName(),
+            self.__columns_object._total_IR_col.getName(),
+            self.__columns_object._total_costs_col.getName(),
+        )
+        
+        # Aditional taxes
+        # additional_taxes = (taxes_buy + taxes_sell)
+        # additional_taxes = total_taxes - additional_taxes
+        self.sumTwoColumns(
+            self.__columns_object._taxes_buy_col.getName(),
+            self.__columns_object._taxes_sell_col.getName(),
+            self.__columns_object._additional_taxes_col.getName(), # temporary variable
+        )
+        self.subtractTwoColumns(
+            self.__columns_object._total_taxes_col.getName(),
+            self.__columns_object._additional_taxes_col.getName(),
+            self.__columns_object._additional_taxes_col.getName(),
+        )
+        
+        # Aditional IR
+        # additional_IR = (IR_buy + IR_sell)
+        # additional_IR = total_IR - additional_IR
+        self.sumTwoColumns(
+            self.__columns_object._IR_buy_col.getName(),
+            self.__columns_object._IR_sell_col.getName(),
+            self.__columns_object._additional_IR_col.getName(), # temporary variable
+        )
+        self.subtractTwoColumns(
+            self.__columns_object._total_IR_col.getName(),
+            self.__columns_object._additional_IR_col.getName(),
+            self.__columns_object._additional_IR_col.getName(),
         )
 
 
@@ -252,11 +311,15 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
                 self.__setDateColumns(slice_index, data_list, column_name_list)
                 self.__setBuyColumns(slice_index, data_list, column_name_list)
                 self.__setSellColumns(slice_index, data_list, column_name_list)
+                self.__setTotalCostsColumns(slice_index, data_list, column_name_list)
                 self.__appendNewDataLine(data_list, column_name_list)        
         
         # Values calculated 'col-to-col'
+        self.__setBuyCosts()
+        self.__setSellCosts()
         self.__setMeanBuyPrice()
         self.__setMeanSellPrice()
+        self.__setOtherCosts()
         
         self._raw_df.reset_index(drop=True, inplace=True)
 

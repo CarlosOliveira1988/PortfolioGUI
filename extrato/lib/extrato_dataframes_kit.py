@@ -285,23 +285,27 @@ class ExtratoDBKit(DataframesDBKitInterface):
         self,
         slice_index: int,
         extrato_raw_column_obj: RawColumn,
-        operation_type: str,
+        operation_type: str = "ALL",
     ):
         """Return the sum value from the 'sliced dataframe'.
         
         This method is useful to get the sum of columns such as Prices, Taxes and other related.
         
         The 'operation_type (str)' is any operation string related to the 'ExtratoOperations' class.
+        
+        If ' operation_type=="ALL" ', then no subfilter is applied to the sliced dataframe.
+        If ' operation_type==some_operation_type ', then a subfilter is applied to the sliced dataframe.
         """
         extrato_df_filtered = self.getFilteredSliceExtrato(slice_index)
 
         # Filter per Operation type
-        if operation_type in self.__operations_object.getOperationsList():
-            operation_col = self.__columns_object._operation_col.getName()
-            extrato_df_filtered = extrato_df_filtered.loc[extrato_df_filtered[operation_col].isin([operation_type])]
-        else:
-            msg = "The " + str(operation_type) + " is not a valid operation type. See the ExtratoOperations class."
-            raise ValueError(msg)
+        if operation_type != "ALL":
+            if operation_type in self.__operations_object.getOperationsList():
+                operation_col = self.__columns_object._operation_col.getName()
+                extrato_df_filtered = extrato_df_filtered.loc[extrato_df_filtered[operation_col].isin([operation_type])]
+            else:
+                msg = "The " + str(operation_type) + " is not a valid operation type. See the ExtratoOperations class."
+                raise ValueError(msg)
 
         return sum(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
 
