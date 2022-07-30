@@ -26,8 +26,8 @@ class ClosedPositionDBColumns(ColumnsInterface):
         self._final_date_col = self.addRawColumn("Data Final", "date") # row-by-row
 
         # Total period
-        self._length_in_days_col = self.addRawColumn("Dias", "number") # col-to-col
-        self._length_in_months_col = self.addRawColumn("Meses", "number") # col-to-col
+        # self._length_in_days_col = self.addRawColumn("Dias", "number") # col-to-col
+        # self._length_in_months_col = self.addRawColumn("Meses", "number") # col-to-col
 
         # Buy data
         self._quantity_buy_col = self.addRawColumn("Quantidade[C]", "number") # row-by-row
@@ -66,9 +66,10 @@ class ClosedPositionDBColumns(ColumnsInterface):
         self._total_earnings_col = self.addRawColumn("Proventos Totais", "$") # Including all dividends and JCP
 
         # Final results
-        self._gross_margin_col = self.addRawColumn("Resultado Bruto", "$")
-        self._gross_margin_p_col = self.addRawColumn("Resultado Bruto (%)", "%")
-        self._net_margin_col = self.addRawColumn("Resultado Líquido", "$")
-        self._net_margin_p_col = self.addRawColumn("Resultado Líquido (%)", "%")
-        self._benchmark_IPCA_col = self.addRawColumn("IPCA+ (a.a.)", "%") # comparison to IPCA treasury in the period
-        self._benchmark_CDI_col = self.addRawColumn("*CDI (a.a.)", "%") # comparison to CDI in the period
+        self._delta_sell_buy_col = self.addRawColumn("Venda-Compra", "$")
+        self._gross_margin_col = self.addRawColumn("Margem Bruta", "$")
+        self._gross_margin_p_col = self.addRawColumn("Margem Bruta (%)", "%")
+        self._net_margin_col = self.addRawColumn("Margem Líquida", "$")
+        self._net_margin_p_col = self.addRawColumn("Margem Líquida (%)", "%")
+        # self._benchmark_IPCA_col = self.addRawColumn("IPCA+ (a.a.)", "%") # comparison to IPCA treasury in the period
+        # self._benchmark_CDI_col = self.addRawColumn("*CDI (a.a.)", "%") # comparison to CDI in the period

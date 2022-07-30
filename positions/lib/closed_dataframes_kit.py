@@ -18,7 +18,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         self.formatDataframes()
 
 
-    """Row-by-row"""
+    """Row-by-row calculation."""
 
     def __getEmptyDataLineLists(self):
         data_list = []
@@ -200,8 +200,27 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             )
         )
 
+    def __setIncomeColumns(self, slice_index: int, data_list: list, column_name_list: list) -> None:
+        # Dividends
+        column_name_list.append(self.__columns_object._dividends_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._dividends_col,
+            )
+        )
 
-    """Col-to-col"""
+        # JCP
+        column_name_list.append(self.__columns_object._JCP_col.getName())
+        data_list.append(
+            self.__extrato_kit_object.getSumValueFromExtratoSlice(
+                slice_index,
+                self.__extrato_kit_object.getColumnsObject()._JCP_col,
+            )
+        )
+
+
+    """Column-to-column calculation."""
 
     def __setBuyCostsColumns(self) -> None:
         self.sumTwoColumns(
@@ -297,6 +316,61 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._additional_IR_col.getName(),
         )
 
+    def __setTotalIncomeColumns(self) -> None:
+        self.sumTwoColumns(
+            self.__columns_object._dividends_col.getName(),
+            self.__columns_object._JCP_col.getName(),
+            self.__columns_object._total_earnings_col.getName(),
+        )
+
+    def __setFinalResultsColumns(self) -> None:
+        """Calculate the final result columns based in the following method:
+        
+            * "Venda-Compra" = "Preço Total[V]" - "Preço Total[C]"
+
+            * "Margem Bruta" = "Venda-Compra" + "Proventos Totais"
+            * "Margem Bruta (%)" = "Margem Bruta" / "Preço Total[C]"
+
+            * "Margem Líquida" = "Margem Bruta" - "Custos Totais"
+            * "Margem Líquida (%)" = "Margem Líquida" / "Preço Total[C]"
+        """
+        # Sell-Buy
+        self.subtractTwoColumns(
+            self.__columns_object._total_sell_price_col.getName(),
+            self.__columns_object._total_buy_price_col.getName(),
+            self.__columns_object._delta_sell_buy_col.getName(),
+        )
+        
+        # Gross margin
+        self.sumTwoColumns(
+            self.__columns_object._delta_sell_buy_col.getName(),
+            self.__columns_object._total_earnings_col.getName(),
+            self.__columns_object._gross_margin_col.getName(),
+        )
+
+        # Gross margin (%)
+        self.divideTwoColumns(
+            self.__columns_object._gross_margin_col.getName(),
+            self.__columns_object._total_buy_price_col.getName(),
+            self.__columns_object._gross_margin_p_col.getName(),
+        )
+
+        # Net margin
+        self.subtractTwoColumns(
+            self.__columns_object._gross_margin_col.getName(),
+            self.__columns_object._total_costs_col.getName(),
+            self.__columns_object._net_margin_col.getName(),
+        )
+
+        # Net margin (%)
+        self.divideTwoColumns(
+            self.__columns_object._net_margin_col.getName(),
+            self.__columns_object._total_buy_price_col.getName(),
+            self.__columns_object._net_margin_p_col.getName(),
+        )
+
+
+    """Main frames for calculation."""
 
     def __addValuesCalculatedRowByRow(self) -> None:
         extrato_df_slice_list = self.__extrato_kit_object.getExtratoSliceList()
@@ -309,6 +383,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
                 self.__setBuyColumns(slice_index, data_list, column_name_list)
                 self.__setSellColumns(slice_index, data_list, column_name_list)
                 self.__setTotalCostsColumns(slice_index, data_list, column_name_list)
+                self.__setIncomeColumns(slice_index, data_list, column_name_list)
                 self.appendNewDataLine(data_list, column_name_list) 
 
     def __addValuesCalculatedColToCol(self) -> None:
@@ -317,6 +392,8 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         self.__setMeanBuyPriceColumns()
         self.__setMeanSellPriceColumns()
         self.__setOtherCostsColumns()
+        self.__setTotalIncomeColumns()
+        self.__setFinalResultsColumns()
 
     def __addValuesToCalculatedColumns(self) -> None:
         self.__addValuesCalculatedRowByRow()
