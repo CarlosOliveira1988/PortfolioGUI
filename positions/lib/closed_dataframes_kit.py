@@ -18,6 +18,8 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         self.formatDataframes()
 
 
+    """Row-by-row"""
+
     def __getEmptyDataLineLists(self):
         data_list = []
         column_name_list = []
@@ -199,21 +201,23 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         )
 
 
-    def __setBuyCosts(self) -> None:
+    """Col-to-col"""
+
+    def __setBuyCostsColumns(self) -> None:
         self.sumTwoColumns(
             self.__columns_object._taxes_buy_col.getName(),
             self.__columns_object._IR_buy_col.getName(),
             self.__columns_object._costs_buy_col.getName(),
         )
 
-    def __setSellCosts(self) -> None:
+    def __setSellCostsColumns(self) -> None:
         self.sumTwoColumns(
             self.__columns_object._taxes_sell_col.getName(),
             self.__columns_object._IR_sell_col.getName(),
             self.__columns_object._costs_sell_col.getName(),
         )
 
-    def __setMeanBuyPrice(self) -> None:
+    def __setMeanBuyPriceColumns(self) -> None:
         # Mean Buy
         self.divideTwoColumns(
             self.__columns_object._total_buy_price_col.getName(),
@@ -235,7 +239,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._mean_costs_buy_price_col.getName(),
         )
     
-    def __setMeanSellPrice(self) -> None:
+    def __setMeanSellPriceColumns(self) -> None:
         # Mean Sell
         self.divideTwoColumns(
             self.__columns_object._total_sell_price_col.getName(),
@@ -257,7 +261,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._mean_costs_sell_price_col.getName(),
         )
 
-    def __setOtherCosts(self) -> None:
+    def __setOtherCostsColumns(self) -> None:
         # Total costs
         self.sumTwoColumns(
             self.__columns_object._total_taxes_col.getName(),
@@ -308,11 +312,11 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
                 self.appendNewDataLine(data_list, column_name_list) 
 
     def __addValuesCalculatedColToCol(self) -> None:
-        self.__setBuyCosts()
-        self.__setSellCosts()
-        self.__setMeanBuyPrice()
-        self.__setMeanSellPrice()
-        self.__setOtherCosts()
+        self.__setBuyCostsColumns()
+        self.__setSellCostsColumns()
+        self.__setMeanBuyPriceColumns()
+        self.__setMeanSellPriceColumns()
+        self.__setOtherCostsColumns()
 
     def __addValuesToCalculatedColumns(self) -> None:
         self.__addValuesCalculatedRowByRow()
