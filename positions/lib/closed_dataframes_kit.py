@@ -198,27 +198,22 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             )
         )
 
-    def __appendNewDataLine(self, data_list: list, column_name_list: list) -> None:
-        df = pd.DataFrame(columns=column_name_list)
-        df = df.append(dict(zip(df.columns, data_list)), ignore_index=True)
-        self._raw_df = pd.concat([self._raw_df, df])
 
-
-    def __setBuyCosts(self):
+    def __setBuyCosts(self) -> None:
         self.sumTwoColumns(
             self.__columns_object._taxes_buy_col.getName(),
             self.__columns_object._IR_buy_col.getName(),
             self.__columns_object._costs_buy_col.getName(),
         )
 
-    def __setSellCosts(self):
+    def __setSellCosts(self) -> None:
         self.sumTwoColumns(
             self.__columns_object._taxes_sell_col.getName(),
             self.__columns_object._IR_sell_col.getName(),
             self.__columns_object._costs_sell_col.getName(),
         )
 
-    def __setMeanBuyPrice(self):
+    def __setMeanBuyPrice(self) -> None:
         # Mean Buy
         self.divideTwoColumns(
             self.__columns_object._total_buy_price_col.getName(),
@@ -240,7 +235,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._mean_costs_buy_price_col.getName(),
         )
     
-    def __setMeanSellPrice(self):
+    def __setMeanSellPrice(self) -> None:
         # Mean Sell
         self.divideTwoColumns(
             self.__columns_object._total_sell_price_col.getName(),
@@ -262,7 +257,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._mean_costs_sell_price_col.getName(),
         )
 
-    def __setOtherCosts(self):
+    def __setOtherCosts(self) -> None:
         # Total costs
         self.sumTwoColumns(
             self.__columns_object._total_taxes_col.getName(),
@@ -299,10 +294,8 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         )
 
 
-    def __addValuesToCalculatedColumns(self) -> None:
+    def __addValuesCalculatedRowByRow(self) -> None:
         extrato_df_slice_list = self.__extrato_kit_object.getExtratoSliceList()
-        
-        # Values calculated 'row-by-row'
         for slice_index in extrato_df_slice_list:
             if self.__extrato_kit_object.isClosedPositionSliceType(slice_index):
                 data_list, column_name_list = self.__getEmptyDataLineLists()
@@ -312,16 +305,20 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
                 self.__setBuyColumns(slice_index, data_list, column_name_list)
                 self.__setSellColumns(slice_index, data_list, column_name_list)
                 self.__setTotalCostsColumns(slice_index, data_list, column_name_list)
-                self.__appendNewDataLine(data_list, column_name_list)        
-        
-        # Values calculated 'col-to-col'
+                self.appendNewDataLine(data_list, column_name_list) 
+
+    def __addValuesCalculatedColToCol(self) -> None:
         self.__setBuyCosts()
         self.__setSellCosts()
         self.__setMeanBuyPrice()
         self.__setMeanSellPrice()
         self.__setOtherCosts()
-        
-        self._raw_df.reset_index(drop=True, inplace=True)
+
+    def __addValuesToCalculatedColumns(self) -> None:
+        self.__addValuesCalculatedRowByRow()
+        self.__addValuesCalculatedColToCol()        
+        self.resetDataframeIndex()
+
 
     def readExcelFile(self, file) -> None:
         """Method Overridden from 'DataframesDBKitInterface' class."""

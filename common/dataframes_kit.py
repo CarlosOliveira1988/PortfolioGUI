@@ -166,10 +166,6 @@ class DataframesDBKitInterface(DataframesKitInterface):
         """Sum the 'col_A' and 'col_B' to put the result in the 'result_col'."""
         self._raw_df[result_col] = self._raw_df[col_A] + self._raw_df[col_B]
 
-    def sumColumnsList(self, col_list: list, result_col: str) -> None:
-        """Sum all columns in the 'col_list' and put the result in the 'result_col'."""
-        self._raw_df[result_col] = self._raw_df[col_list].sum(axis=1)
-
     def multiplyTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
         """Multiply the 'col_A' and 'col_B' to put the result in the 'result_col'."""
         self._raw_df[result_col] = self._raw_df[col_A] * self._raw_df[col_B]
@@ -192,3 +188,13 @@ class DataframesDBKitInterface(DataframesKitInterface):
         self._raw_df[target_col] = self._raw_df[target_col].where(
             self._raw_df[except_col] == except_val, target_val
         )
+
+    def appendNewDataLine(self, data_list: list, column_name_list: list) -> None:
+        """Insert a new data line given the column name and data lists."""
+        df = pd.DataFrame(columns=column_name_list)
+        df = df.append(dict(zip(df.columns, data_list)), ignore_index=True)
+        self._raw_df = pd.concat([self._raw_df, df])
+
+    def resetDataframeIndex(self):
+        """Reset the index of the dataframe."""
+        self._raw_df.reset_index(drop=True, inplace=True)
