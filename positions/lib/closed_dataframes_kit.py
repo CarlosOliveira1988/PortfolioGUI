@@ -18,6 +18,11 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         self.formatDataframes()
 
 
+    def __getEmptyDataLineLists(self):
+        data_list = []
+        column_name_list = []
+        return data_list, column_name_list
+
     def __setTickerClassificationColumns(self, slice_index: int, data_list: list, column_name_list: list) -> None:
         # Market
         column_name_list.append(self.__columns_object._market_col.getName())
@@ -188,7 +193,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._mean_buy_price_col.getName(),
         )
         
-        # Buy + costs
+        # Buy + costs: the costs rises the 'buy price'
         self.sumColumnsList(
             [
                 self.__columns_object._total_buy_price_col.getName(),
@@ -198,7 +203,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._total_costs_buy_price_col.getName(),
         )
         
-        # Mean Buy + costs
+        # Mean Buy + costs: the costs rises the 'mean buy price'
         self.divideTwoColumns(
             self.__columns_object._total_costs_buy_price_col.getName(),
             self.__columns_object._quantity_buy_col.getName(),
@@ -213,17 +218,21 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
             self.__columns_object._mean_sell_price_col.getName(),
         )
         
-        # Sell + costs
+        # Sell + costs: the costs reduces the 'sell price'
         self.sumColumnsList(
             [
-                self.__columns_object._total_sell_price_col.getName(),
                 self.__columns_object._taxes_sell_col.getName(),
                 self.__columns_object._IR_sell_col.getName(),
             ],
+            self.__columns_object._total_costs_sell_price_col.getName(), # temp column to save the costs
+        )
+        self.subtractTwoColumns(
+            self.__columns_object._total_sell_price_col.getName(),
+            self.__columns_object._total_costs_sell_price_col.getName(),
             self.__columns_object._total_costs_sell_price_col.getName(),
         )
         
-        # Mean Sell + costs
+        # Mean Sell + costs: the costs reduces the 'mean sell price'
         self.divideTwoColumns(
             self.__columns_object._total_costs_sell_price_col.getName(),
             self.__columns_object._quantity_sell_col.getName(),
@@ -237,8 +246,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         # Values calculated 'row-by-row'
         for slice_index in extrato_df_slice_list:
             if self.__extrato_kit_object.isClosedPositionSliceType(slice_index):
-                data_list = []
-                column_name_list = []
+                data_list, column_name_list = self.__getEmptyDataLineLists()
                 self.__setTickerClassificationColumns(slice_index, data_list, column_name_list)
                 self.__setYieldColumns(slice_index, data_list, column_name_list)
                 self.__setDateColumns(slice_index, data_list, column_name_list)

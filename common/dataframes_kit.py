@@ -158,6 +158,10 @@ class DataframesDBKitInterface(DataframesKitInterface):
         self.__columns_object = columns_object
         super().__init__(self.__columns_object)
 
+    def subtractTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
+        """Subtract the 'col_A' and 'col_B' to put the result in the 'result_col'."""
+        self._raw_df[result_col] = self._raw_df[col_A] - self._raw_df[col_B]
+
     def sumTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
         """Sum the 'col_A' and 'col_B' to put the result in the 'result_col'."""
         self._raw_df[result_col] = self._raw_df[col_A] + self._raw_df[col_B]
