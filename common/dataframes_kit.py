@@ -191,8 +191,8 @@ class DataframesDBKitInterface(DataframesKitInterface):
 
     def appendNewDataLine(self, data_list: list, column_name_list: list) -> None:
         """Insert a new data line given the column name and data lists."""
-        df = pd.DataFrame(columns=column_name_list)
-        df = df.append(dict(zip(df.columns, data_list)), ignore_index=True)
+        data_list = [[data] for data in data_list]
+        df = pd.DataFrame.from_dict(dict(zip(column_name_list, data_list)))
         self._raw_df = pd.concat([self._raw_df, df])
 
     def resetDataframeIndex(self):
