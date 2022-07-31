@@ -15,6 +15,16 @@ class ClosedPositionsTableInfo:
     
     def __showDataframe(self) -> None:
         st.write("", self.__filtered_fmtdf.astype(str))
+        expander = st.expander("Informações:")
+        expander.write("""A tabela acima mostra todas as __Posições Encerradas__ registradas na planilha __Extrato__.
+            As  __Posições Encerradas__ são identificadas a partir das colunas __Ticker__ e __Quantidade__,
+            combinadas com as colunas __Data__ e __Operação__. Basicamente:\n\n1. a tabela da planilha __Extrato__ é 
+            ordenada pela coluna __Data__; então, gera-se uma lista de __Ticker__;\n2. para cada __Ticker__ da lista,
+            o algoritmo irá buscar quantidades associadas à __Operação:Compra__ e __Operação:Venda__, varrendo linha 
+            a linha da planilha __Extrato__, somando as quantidades de cada linha; \n3. quando o somatório da __quantidade
+            de compra__ for igual ao somatório da __quantidade de venda__, então temos uma __Posição Encerrada__.
+            """
+        )
 
     def setDataframe(self, dataframe: pd.DataFrame) -> None:
         self.__filtered_fmtdf = dataframe

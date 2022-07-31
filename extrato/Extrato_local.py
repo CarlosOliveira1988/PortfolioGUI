@@ -38,7 +38,7 @@ class ExtratoGuiLocal:
         self.file_path = os.path.join(self.folder_path, selected_filename)
 
     def __showSelectedFile(self) -> None:
-        st.write('Planilha atual: ', st.session_state.extrato_file)
+        st.write('__Planilha atual:__ ', st.session_state.extrato_file)
 
     def __showUpdateFileButton(self) -> None:
         if st.button("Selecionar"):

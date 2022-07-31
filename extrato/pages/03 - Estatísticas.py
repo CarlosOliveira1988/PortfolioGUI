@@ -27,13 +27,13 @@ class ExtratoAssetsInfo:
     def showInfo(self) -> None:
         st.write('#### Compras e Vendas de ativos no período [R$]')
         st.bar_chart(self.__statistics.getResultDataframe())
-        st.write('Vendas: ', self.__statistics.getPositiveOperationString())
-        st.write('Compras: ', self.__statistics.getNegativeOperationString())
-        st.write('Diferença: ', self.__statistics.getDeltaOperationString())
+        st.write('__Vendas:__ ', self.__statistics.getPositiveOperationString())
+        st.write('__Compras:__ ', self.__statistics.getNegativeOperationString())
+        st.write('__Diferença:__ ', self.__statistics.getDeltaOperationString())
         expander = st.expander("Informações:")
         expander.write("""
-            O gráfico acima mostra os valores de Compras e Vendas de ativos ao longo do período informado. \n\n
-            Esses valores são representados na coluna 'Operação' como 'Compra' e 'Venda'.
+            O gráfico acima mostra os valores de __Compras__ e __Vendas__ de ativos ao longo do período informado.
+            \n\nEsses valores são representados na coluna __Operação__ como __Compra__ e __Venda__.
         """)
 
 
@@ -58,13 +58,13 @@ class ExtratoEarnsCostsInfo:
     def showInfo(self) -> None:
         st.write('#### Proventos e Custos no período [R$]')
         st.bar_chart(self.__statistics.getResultDataframe())
-        st.write('Proventos: ', self.__statistics.getPositiveOperationString())
-        st.write('Custos: ', self.__statistics.getNegativeOperationString())
-        st.write('Diferença: ', self.__statistics.getDeltaOperationString())
+        st.write('__Proventos:__ ', self.__statistics.getPositiveOperationString())
+        st.write('__Custos:__ ', self.__statistics.getNegativeOperationString())
+        st.write('__Diferença:__ ', self.__statistics.getDeltaOperationString())
         expander = st.expander("Informações:")
         expander.write("""
-            O gráfico acima mostra os valores de Proventos e Custos ao longo do período informado. \n\n
-            Esses valores são calculados a partir das colunas 'Dividendos', 'JCP', 'IR' e 'Taxas'.
+            O gráfico acima mostra os valores de __Proventos__ e __Custos__ ao longo do período informado.
+            \n\nEsses valores são calculados a partir das colunas __Dividendos__, __JCP__, __IR__ e __Taxas__.
         """)
 
 

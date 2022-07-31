@@ -15,6 +15,12 @@ class ExtratoRawTableInfo:
     
     def __showDataframe(self) -> None:
         st.write("", self.__filtered_fmtdf.astype(str))
+        expander = st.expander("Informações:")
+        expander.write(
+            """A tabela acima é uma cópia da planilha __Extrato__, incluindo todas as transações
+            registradas pelo usuário.
+            """
+        )
 
     def setDataframe(self, dataframe: pd.DataFrame) -> None:
         self.__filtered_fmtdf = dataframe

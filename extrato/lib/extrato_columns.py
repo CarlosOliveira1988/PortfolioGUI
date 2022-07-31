@@ -148,4 +148,4 @@ class ExtratoDBColumns(ExtratoColumnsInterface):
 
         # Slice columns
         self._slice_index_col = self.addRawColumn("Posição", "number")
-        self._slice_type_col = self.addRawColumn("Tipo", "string")
+        self._slice_type_col = self.addRawColumn("Tipo de Posição", "string")

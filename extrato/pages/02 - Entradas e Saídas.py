@@ -27,13 +27,14 @@ class ExtratoAccountInfo:
     def showInfo(self) -> None:
         st.write('#### Entradas e Saídas da conta no período [R$]')
         st.bar_chart(self.__statistics.getResultDataframe())
-        st.write('Transferências: ', self.__statistics.getPositiveOperationString())
-        st.write('Resgates: ', self.__statistics.getNegativeOperationString())
-        st.write('Diferença: ', self.__statistics.getDeltaOperationString())
+        st.write('__Transferências:__ ', self.__statistics.getPositiveOperationString())
+        st.write('__Resgates:__ ', self.__statistics.getNegativeOperationString())
+        st.write('__Diferença:__ ', self.__statistics.getDeltaOperationString())
         expander = st.expander("Informações:")
         expander.write("""
-            O gráfico acima mostra os valores de Entradas e Saídas da conta de investimento ao longo do período informado. \n\n
-            Esses valores são representados na coluna 'Operação' como 'Transferência' e 'Resgate'.
+            O gráfico acima mostra os valores de __Entradas__ e __Saídas__ da conta de investimento ao 
+            longo do período informado. \n\n Esses valores são representados na coluna __Operação__ como 
+            __Transferência__ e __Resgate__.
         """)
 
 
