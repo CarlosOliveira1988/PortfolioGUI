@@ -60,7 +60,7 @@ class ClosedPositionSideBarInterface:
             date_option = st.sidebar.slider('Período:', min_value=start_date, max_value=end_date, value=(start_date, end_date))
             init_date = date_option[0]
             finish_date = date_option[1]
-        self.__filter_object.applyDateFilter(init_date, finish_date)
+        self.__filter_object.applyPeriodFilter(init_date, finish_date)
     
     def __showSideBar(self) -> None:
         self.__showSubHearder()
@@ -68,8 +68,8 @@ class ClosedPositionSideBarInterface:
             self.__showMarketFilter()
         if self.__ticker_filter:
             self.__showTickerFilter()
-        # if self.__period_filter:
-        #     self.__showPeriodFilter()
+        if self.__period_filter:
+            self.__showPeriodFilter()
     
     def updateDataframe(self, file: str) -> None:
         self.__filter_object.updateDataframe(file)

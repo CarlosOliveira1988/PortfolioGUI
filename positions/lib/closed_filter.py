@@ -16,15 +16,16 @@ class ClosedPositionDBFilter(FilterInterface):
         self.__columns_object = columns_object
         self.__df_interface_object = df_interface_object
         super().__init__(self.__df_interface_object, self.__columns_object)
-    
-    def applyOperationFilter(self, operation: str) -> None:
-        column = self.__columns_object._operation_col.getName()
-        if operation != "Exibir todas":
-            self._filtered_df = self._filtered_df.loc[self._filtered_df[column] == operation]
-            self._filtered_fmtdf = self._filtered_fmtdf.loc[self._filtered_fmtdf[column] == operation]
-    
-    def applyDateFilter(self, start_date: pd.Timestamp, end_date: pd.Timestamp) -> None:
-        column = self.__columns_object._date_col.getName()
+
+    def applyPeriodFilter(self, start_date: pd.Timestamp, end_date: pd.Timestamp) -> None:
+        initial_date_column = self.__columns_object._initial_date_col.getName()
+        final_date_column = self.__columns_object._final_date_col.getName()
         if start_date and end_date:
-            self._filtered_df = self._filtered_df.loc[(start_date <= self._filtered_df[column]) & (self._filtered_df[column] <= end_date)]
-            self._filtered_fmtdf = self._filtered_fmtdf.loc[(start_date <= self._filtered_fmtdf[column]) & (self._filtered_fmtdf[column] <= end_date)]
+            self._filtered_df = self._filtered_df.loc[
+                (start_date <= self._filtered_df[initial_date_column]) & 
+                (self._filtered_df[final_date_column] <= end_date)
+            ]
+            self._filtered_fmtdf = self._filtered_fmtdf.loc[
+                (start_date <= self._filtered_fmtdf[initial_date_column]) &
+                (self._filtered_fmtdf[final_date_column] <= end_date)
+            ]
