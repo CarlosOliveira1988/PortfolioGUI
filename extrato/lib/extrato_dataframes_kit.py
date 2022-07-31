@@ -27,17 +27,139 @@ class ExtratoRawKit(ExtratoDataframesKitInterface):
         super().__init__(self.__columns_object)
 
 
+class ExtratoDBSlicer:
+    def __init__(self) -> None:
+        """Structure to create slices based on Extrato dataframes."""
+        self.__columns_object = ExtratoDBColumns()
+        self.__extrato_slice_index_col = self.__columns_object._slice_index_col.getName()
+        self.__extrato_slice_type_col = self.__columns_object._slice_type_col.getName()
+
+        self.__postitions_type = InvestmentPositionType()
+        self.__operations_object = ExtratoOperations()
+
+        self.extrato_df = pd.DataFrame()
+        self.extrato_sliced_df = pd.DataFrame()
+        self.slice_index = None
+
+    def setExtratoDataframe(self, extrato_df: pd.DataFrame) -> None:
+        self.extrato_df = extrato_df.copy()
+        self.extrato_sliced_df = None
+
+    def getExtratoSliceIndexList(self) -> list:
+        """Return a list of all slice indexes."""
+        df_column = self.extrato_df[[self.__extrato_slice_index_col]].copy()
+        df_column = df_column.dropna()
+        df_column = df_column.drop_duplicates()
+        df_column_list = df_column[self.__extrato_slice_index_col].to_list()
+        if df_column_list:
+            df_column_list.sort()
+        return df_column_list
+
+    def updateSlicedDataframeByIndex(self, slice_index: int) -> pd.DataFrame:
+        self.slice_index = slice_index
+        self.extrato_sliced_df = self.getSlicedDataframe()
+
+    def getSlicedDataframe(self) -> pd.DataFrame:
+        """Return a filtered dataframe per slice index: 'sliced dataframe'."""
+        return self.extrato_df.loc[self.extrato_df[self.__extrato_slice_index_col].isin([self.slice_index])]
+
+    def isClosedPositionSlicedDataframe(self) -> bool:
+        """Check if the specified 'sliced dataframe' is related to Closed Positions."""
+        return not self.extrato_sliced_df.loc[
+            self.extrato_sliced_df[self.__extrato_slice_type_col].isin([self.__postitions_type.getClosedPosition()])
+        ].empty
+
+    def getUniqueValueFromSlicedDataframe(
+        self,
+        extrato_raw_column_obj: RawColumn,
+        first_line_value=True,
+    ):
+        """Return an unique value from the 'sliced dataframe'.
+        
+        This method is useful to get information such as Ticker, Market and other repeated data cells.
+        
+        If 'first_line_value==True': return the value from the first line
+        
+        If 'first_line_value==False': return the value from the last line
+        """
+        extrato_column_value_list = self.extrato_sliced_df[extrato_raw_column_obj.getName()].to_list()
+        if first_line_value:
+            return extrato_column_value_list[0]
+        else:
+            return extrato_column_value_list[-1]
+
+    def getMinMaxValueFromSlicedDataframe(
+        self,
+        extrato_raw_column_obj: RawColumn,
+        only_buy_operation=True,
+        minimum_value_flag=True,
+    ):
+        """Return a minimum/maximum value from the 'sliced dataframe'.
+        
+        This method is useful to get data such as Prices, Yield and other number's cells.
+        
+        If 'minimum_value_flag==True': return the minimum value in the given column.
+        If 'minimum_value_flag==False': return the maximum value in the given column.
+        
+        If 'only_buy_operation==True': consider only lines with the tag 'buy'
+        If 'only_buy_operation==False': consider all lines of the 'sliced dataframe'
+        """
+        extrato_df_filtered = self.extrato_sliced_df.copy()
+
+        # Filter per Buy Operation
+        if only_buy_operation:
+            buy_operation = self.__operations_object.getBuyOperation()
+            operation_col = self.__columns_object._operation_col.getName()
+            extrato_df_filtered = extrato_df_filtered.loc[extrato_df_filtered[operation_col].isin([buy_operation])]
+
+        extrato_col_data_list = extrato_df_filtered[extrato_raw_column_obj.getName()].to_list()
+        if extrato_col_data_list:
+            # Return Minimum/Maximum value
+            if minimum_value_flag:
+                return min(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
+            else:
+                return max(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
+        else:
+            return 0.0
+
+    def getSumValueFromSlicedDataframe(
+        self,
+        extrato_raw_column_obj: RawColumn,
+        operation_type: str = "ALL",
+    ):
+        """Return the sum value from the 'sliced dataframe'.
+        
+        This method is useful to get the sum of columns such as Prices, Taxes and other related.
+        
+        The 'operation_type (str)' is any operation string related to the 'ExtratoOperations' class.
+        
+        If ' operation_type=="ALL" ', then no subfilter is applied to the sliced dataframe.
+        If ' operation_type==some_operation_type ', then a subfilter is applied to the sliced dataframe.
+        """
+        extrato_df_filtered = self.extrato_sliced_df.copy()
+
+        # Filter per Operation type
+        if operation_type != "ALL":
+            if operation_type in self.__operations_object.getOperationsList():
+                operation_col = self.__columns_object._operation_col.getName()
+                extrato_df_filtered = extrato_df_filtered.loc[extrato_df_filtered[operation_col].isin([operation_type])]
+            else:
+                msg = "The " + str(operation_type) + " is not a valid operation type. See the ExtratoOperations class."
+                raise ValueError(msg)
+
+        return sum(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
+
+
 class ExtratoDBKit(DataframesDBKitInterface):
     def __init__(self) -> None:
         """Structure to handle a Pandas dataframe based on Extrato Database."""
-        self.__postitions_type = InvestmentPositionType()
+        self.__operations_object = ExtratoOperations()
         self.__columns_object = ExtratoDBColumns()
         super().__init__(self.__columns_object)
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()
 
     def __addValuesToCalculatedColumns(self) -> None:
-        self.__operations_object = ExtratoOperations()
         self.__setTotalPriceColumn()
         self.__setTotalCostsColumn()
         self.__setTotalEarningsColumn()
@@ -116,7 +238,6 @@ class ExtratoDBKit(DataframesDBKitInterface):
             self.__operations_object.getSellOperation(),
             self.__columns_object._sell_price_col.getName(),
         )
-
 
     def __setSliceIndexColumn(self) -> None:
         # Run row-per-row in order to find 'slices'.
@@ -205,117 +326,11 @@ class ExtratoDBKit(DataframesDBKitInterface):
             else:
                 self._raw_df.loc[self._raw_df[slice_index_col] == slice_index, [slice_type_col]] = opened_position
 
-
-    def getFilteredSliceExtrato(self, slice_index: int) -> pd.DataFrame:
-        """Return a filtered dataframe per slice index: 'sliced dataframe'."""
-        extrato_df = self.getNotNanDataframe()
-        extrato_df_slice_index_col = self.__columns_object._slice_index_col.getName()
-        return extrato_df.loc[extrato_df[extrato_df_slice_index_col].isin([slice_index])]
-
-    def isClosedPositionSliceType(self, slice_index: int) -> bool:
-        """Check if the specified 'sliced dataframe' is related to Closed Positions."""
-        extrato_df_filtered_by_slice = self.getFilteredSliceExtrato(slice_index)
-        extrato_df_slice_type_col = self.__columns_object._slice_type_col.getName()
-        closed_position = self.__postitions_type.getClosedPosition()
-        return not extrato_df_filtered_by_slice.loc[
-            extrato_df_filtered_by_slice[extrato_df_slice_type_col].isin([closed_position])
-        ].empty
-
-    def getExtratoSliceList(self) -> list:
-        """Return a list of all slice indexes."""
-        return self.getNonDuplicatedListFromColumn(self.__columns_object._slice_index_col.getName())
-
-    def getUniqueValueFromExtratoSlice(
-        self,
-        slice_index: int,
-        extrato_raw_column_obj: RawColumn,
-        first_line_value=True,
-    ):
-        """Return an unique value from the 'sliced dataframe'.
-        
-        This method is useful to get information such as Ticker, Market and other repeated data cells.
-        
-        If 'first_line_value==True': return the value from the first line
-        
-        If 'first_line_value==False': return the value from the last line
-        """
-        extrato_df_filtered = self.getFilteredSliceExtrato(slice_index)
-        extrato_column_value_list = extrato_df_filtered[extrato_raw_column_obj.getName()].to_list()
-        if first_line_value:
-            return extrato_column_value_list[0]
-        else:
-            return extrato_column_value_list[-1]
-
-    def getMinMaxValueFromExtratoSlice(
-        self,
-        slice_index: int,
-        extrato_raw_column_obj: RawColumn,
-        only_buy_operation=True,
-        minimum_value_flag=True,
-    ):
-        """Return a minimum/maximum value from the 'sliced dataframe'.
-        
-        This method is useful to get data such as Prices, Yield and other number's cells.
-        
-        If 'minimum_value_flag==True': return the minimum value in the given column.
-        If 'minimum_value_flag==False': return the maximum value in the given column.
-        
-        If 'only_buy_operation==True': consider only lines with the tag 'buy'
-        If 'only_buy_operation==False': consider all lines of the 'sliced dataframe'
-        """
-        extrato_df_filtered = self.getFilteredSliceExtrato(slice_index)
-
-        # Filter per Buy Operation
-        if only_buy_operation:
-            buy_operation = self.__operations_object.getBuyOperation()
-            operation_col = self.__columns_object._operation_col.getName()
-            extrato_df_filtered = extrato_df_filtered.loc[extrato_df_filtered[operation_col].isin([buy_operation])]
-
-        extrato_col_data_list = extrato_df_filtered[extrato_raw_column_obj.getName()].to_list()
-        if extrato_col_data_list:
-            # Return Minimum/Maximum value
-            if minimum_value_flag:
-                return min(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
-            else:
-                return max(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
-        else:
-            return 0
-
-    def getSumValueFromExtratoSlice(
-        self,
-        slice_index: int,
-        extrato_raw_column_obj: RawColumn,
-        operation_type: str = "ALL",
-    ):
-        """Return the sum value from the 'sliced dataframe'.
-        
-        This method is useful to get the sum of columns such as Prices, Taxes and other related.
-        
-        The 'operation_type (str)' is any operation string related to the 'ExtratoOperations' class.
-        
-        If ' operation_type=="ALL" ', then no subfilter is applied to the sliced dataframe.
-        If ' operation_type==some_operation_type ', then a subfilter is applied to the sliced dataframe.
-        """
-        extrato_df_filtered = self.getFilteredSliceExtrato(slice_index)
-
-        # Filter per Operation type
-        if operation_type != "ALL":
-            if operation_type in self.__operations_object.getOperationsList():
-                operation_col = self.__columns_object._operation_col.getName()
-                extrato_df_filtered = extrato_df_filtered.loc[extrato_df_filtered[operation_col].isin([operation_type])]
-            else:
-                msg = "The " + str(operation_type) + " is not a valid operation type. See the ExtratoOperations class."
-                raise ValueError(msg)
-
-        return sum(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
-
-
     def readExcelFile(self, file) -> None:
         """Method Overridden from 'ExtratoDataframesKitInterface' class."""
         self._raw_df = self.addColumnIfNotExists(pd.read_excel(file))
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()
-
 
     def getColumnsObject(self) -> ExtratoDBColumns:
         return self.__columns_object
