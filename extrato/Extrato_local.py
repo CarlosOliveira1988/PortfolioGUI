@@ -3,6 +3,7 @@ import os
 import streamlit as st
 
 from extrato.lib.extrato_file_manager import FileManager
+from extrato.lib.extrato_xls_reader import ExtratoExcelReader
 
 
 class ExtratoGuiLocal:
@@ -18,8 +19,11 @@ class ExtratoGuiLocal:
         - If the '.env' file does not exist, create a new one with the Extrato empty template path
         - If the '.env' file already exists, then uses the last saved Extrato spreadsheet path
         """
-        self.file_manager = FileManager()
-        st.session_state.extrato_file = self.file_manager.getExtratoFile()
+        self.__file_manager = FileManager()
+        self.__xls_reader = ExtratoExcelReader()
+        self.__xls_reader.readExcelFile(self.__file_manager.getExtratoFile())
+        st.session_state.extrato_file = self.__file_manager.getExtratoFile()
+        st.session_state.extrato_from_excel = self.__xls_reader.getRawDataframe()
         self.__showInfo()
 
     def __showMainTitle(self) -> None:
@@ -27,15 +31,15 @@ class ExtratoGuiLocal:
 
     def __showFolderSelector(self) -> None:
         folder_path_default = os.path.dirname(st.session_state.extrato_file)
-        self.folder_path = st.text_input(
+        self.__folder_path = st.text_input(
             "Digite no campo o local do arquivo Extrato: ",
             value = folder_path_default,
         )
 
     def __showFileSelector(self) -> None:
-        filenames = [file for file in os.listdir(self.folder_path) if file.endswith((".xls", ".xlsx"))]
+        filenames = [file for file in os.listdir(self.__folder_path) if file.endswith((".xls", ".xlsx"))]
         selected_filename = st.selectbox('Selecione o arquivo Extrato: ', filenames)
-        self.file_path = os.path.join(self.folder_path, selected_filename)
+        self.__file_path = os.path.join(self.__folder_path, selected_filename)
 
     def __showSelectedFile(self) -> None:
         st.write('__Planilha atual:__ ', st.session_state.extrato_file)
@@ -45,11 +49,12 @@ class ExtratoGuiLocal:
             self.__updateExtratoFile()
 
     def __updateExtratoFile(self) -> None:
-        if os.path.isfile(self.file_path):
-            if self.file_path != st.session_state.extrato_file:
-                self.file_manager.setExtratoFile(self.file_path)
-                # At this point, 'st.session_state.extrato_file' is an "string" object
-                st.session_state.extrato_file = self.file_manager.getExtratoFile()
+        if os.path.isfile(self.__file_path):
+            if self.__file_path != st.session_state.extrato_file:
+                self.__file_manager.setExtratoFile(self.__file_path)
+                self.__xls_reader.readExcelFile(self.__file_manager.getExtratoFile())
+                st.session_state.extrato_file = self.__file_manager.getExtratoFile()
+                st.session_state.extrato_from_excel = self.__xls_reader.getRawDataframe()
                 self.__showBadBehaviorInfo()
 
     def __showBadBehaviorInfo(self) -> None:

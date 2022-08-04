@@ -48,11 +48,11 @@ class ExtratoAccountsGUI:
     def __setDataframes(self) -> None:
         self.__account_info.setDataframe(self.__side_bar.getFilteredDataframe())
 
-    def setDataframe(self, file) -> None:
-        self.__side_bar.updateDataframe(file)
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
+        self.__side_bar.updateDataframe(dataframe)
         self.__setDataframes()
         self.__account_info.showInfo()
 
 
 accounts_gui = ExtratoAccountsGUI()
-accounts_gui.setDataframe(st.session_state.extrato_file)
+accounts_gui.setDataframe(st.session_state.extrato_from_excel)

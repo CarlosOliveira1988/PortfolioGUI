@@ -38,8 +38,8 @@ class FilterInterface:
             self._filtered_df = self._filtered_df.loc[self._filtered_df[column] == ticker]
             self._filtered_fmtdf = self._filtered_fmtdf.loc[self._filtered_fmtdf[column] == ticker]
 
-    def updateDataframe(self, file) -> None:
-        self.__df_interface_object.readExcelFile(file)
+    def updateDataframe(self, dataframe: pd.DataFrame) -> None:
+        self.__df_interface_object.setDataframe(dataframe)
         self._updateMainDataframes()
 
     def getDataframe(self) -> pd.DataFrame:

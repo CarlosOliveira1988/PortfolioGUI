@@ -40,11 +40,11 @@ class ExtratoHistoryGUI:
     def __setDataframes(self) -> None:
         self.__table.setDataframe(self.__side_bar.getFilteredFormattedDataframe())
 
-    def setDataframe(self, file: str) -> None:
-        self.__side_bar.updateDataframe(file)
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
+        self.__side_bar.updateDataframe(dataframe)
         self.__setDataframes()
         self.__table.showInfo()
 
 
 history_gui = ExtratoHistoryGUI()
-history_gui.setDataframe(st.session_state.extrato_file)
+history_gui.setDataframe(st.session_state.extrato_from_excel)

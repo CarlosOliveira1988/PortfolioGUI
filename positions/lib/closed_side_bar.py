@@ -71,8 +71,8 @@ class ClosedPositionSideBarInterface:
         if self.__period_filter:
             self.__showPeriodFilter()
     
-    def updateDataframe(self, file: str) -> None:
-        self.__filter_object.updateDataframe(file)
+    def updateDataframe(self, dataframe: pd.DataFrame) -> None:
+        self.__filter_object.updateDataframe(dataframe)
         self.__showSideBar()
     
     def getFilteredDataframe(self) -> pd.DataFrame:

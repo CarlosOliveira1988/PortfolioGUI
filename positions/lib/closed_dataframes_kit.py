@@ -1,3 +1,5 @@
+import pandas as pd
+
 from extrato.lib.extrato_columns import ExtratoOperations
 from extrato.lib.extrato_dataframes_kit import DataframesDBKitInterface, ExtratoDBKit, ExtratoDBSlicer
 
@@ -385,8 +387,8 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         self.resetDataframeIndex()
 
 
-    def readExcelFile(self, file) -> None:
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
         """Method Overridden from 'DataframesDBKitInterface' class."""
-        self.__extrato_kit_object.readExcelFile(file)
+        self.__extrato_kit_object.setDataframe(dataframe)
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()

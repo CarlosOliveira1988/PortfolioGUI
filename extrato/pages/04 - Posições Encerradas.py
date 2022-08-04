@@ -44,11 +44,11 @@ class ClosedPositionGUI:
     def __setDataframes(self) -> None:
         self.__table.setDataframe(self.__side_bar.getFilteredFormattedDataframe())
 
-    def setDataframe(self, file: str) -> None:
-        self.__side_bar.updateDataframe(file)
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
+        self.__side_bar.updateDataframe(dataframe)
         self.__setDataframes()
         self.__table.showInfo()
 
 
 closed_position_gui = ClosedPositionGUI()
-closed_position_gui.setDataframe(st.session_state.extrato_file)
+closed_position_gui.setDataframe(st.session_state.extrato_from_excel)

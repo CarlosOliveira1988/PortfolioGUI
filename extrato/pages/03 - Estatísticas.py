@@ -80,12 +80,12 @@ class ExtratoStatisticsGUI:
         self.__assets_info.setDataframe(self.__side_bar.getFilteredDataframe())
         self.__earns_costs_info.setDataframe(self.__side_bar.getFilteredDataframe())
 
-    def setDataframe(self, file: str) -> None:
-        self.__side_bar.updateDataframe(file)
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
+        self.__side_bar.updateDataframe(dataframe)
         self.__setDataframes()
         self.__assets_info.showInfo()
         self.__earns_costs_info.showInfo()
 
 
 statistics_gui = ExtratoStatisticsGUI()
-statistics_gui.setDataframe(st.session_state.extrato_file)
+statistics_gui.setDataframe(st.session_state.extrato_from_excel)

@@ -326,11 +326,8 @@ class ExtratoDBKit(DataframesDBKitInterface):
             else:
                 self._raw_df.loc[self._raw_df[slice_index_col] == slice_index, [slice_type_col]] = opened_position
 
-    def readExcelFile(self, file) -> None:
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
         """Method Overridden from 'ExtratoDataframesKitInterface' class."""
-        self._raw_df = self.addColumnIfNotExists(pd.read_excel(file))
+        self._raw_df = self.addColumnIfNotExists(dataframe)
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()
-
-    def getColumnsObject(self) -> ExtratoDBColumns:
-        return self.__columns_object

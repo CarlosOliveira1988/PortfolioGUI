@@ -108,6 +108,10 @@ class DataframesKitInterface:
         self._raw_df = pd.DataFrame(columns=self.__columns_object.getColumnsNameList())
         self.formatDataframes()
 
+    def setDataframe(self, dataframe: pd.DataFrame) -> None:
+        self._raw_df = self.addColumnIfNotExists(dataframe)
+        self.formatDataframes()
+
     def addColumnIfNotExists(self, dataframe) -> pd.DataFrame:
         # Create the column witn NaN values
         for column, raw_column_obj in self.__columns_object.getRawColumnsDict().items():
@@ -118,10 +122,6 @@ class DataframesKitInterface:
     def formatDataframes(self) -> None:
         self.__kit_formatter.formatDataframes(self._raw_df)
 
-    def readExcelFile(self, file) -> None:
-        self._raw_df = self.addColumnIfNotExists(pd.read_excel(file))
-        self.formatDataframes()
-
     def getRawDataframe(self) -> pd.DataFrame:
         return self._raw_df.copy()
     
@@ -130,6 +130,20 @@ class DataframesKitInterface:
     
     def getFormattedDataframe(self) -> pd.DataFrame:
         return self.__kit_formatter.getFormattedDataframe()
+
+    def getColumnsObject(self) -> ColumnsInterface:
+        return self.__columns_object
+
+
+class DataframesDBKitInterface(DataframesKitInterface):
+    def __init__(self, columns_object: ColumnsInterface) -> None:
+        """Structure to handle a Pandas dataframe to perform some calculations.
+        
+        Args:
+        - columns_object: any object instance inherited from 'ColumnsInterface'
+        """
+        self.__columns_object = columns_object
+        super().__init__(self.__columns_object)
 
     def getNonDuplicatedListFromColumn(self, target_col: str, dropna=True, sorted=True) -> list:
         """Return a non-duplicated values list from a given column."""
@@ -146,17 +160,6 @@ class DataframesKitInterface:
                 df_column_list.sort()
         
         return df_column_list
-
-
-class DataframesDBKitInterface(DataframesKitInterface):
-    def __init__(self, columns_object: ColumnsInterface) -> None:
-        """Structure to handle a Pandas dataframe to perform some calculations.
-        
-        Args:
-        - columns_object: any object instance inherited from 'ColumnsInterface'
-        """
-        self.__columns_object = columns_object
-        super().__init__(self.__columns_object)
 
     def subtractTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
         """Subtract the 'col_A' and 'col_B' to put the result in the 'result_col'."""
