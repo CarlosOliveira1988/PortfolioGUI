@@ -3,7 +3,8 @@ import os
 import streamlit as st
 
 from extrato.lib.extrato_file_manager import FileManager
-from extrato.lib.extrato_xls_reader import ExtratoExcelReader
+
+from extrato.Extrato import SessionStateControl
 
 
 class ExtratoGuiLocal:
@@ -20,10 +21,8 @@ class ExtratoGuiLocal:
         - If the '.env' file already exists, then uses the last saved Extrato spreadsheet path
         """
         self.__file_manager = FileManager()
-        self.__xls_reader = ExtratoExcelReader()
-        self.__xls_reader.readExcelFile(self.__file_manager.getExtratoFile())
-        st.session_state.extrato_file = self.__file_manager.getExtratoFile()
-        st.session_state.extrato_from_excel = self.__xls_reader.getRawDataframe()
+        self.__session_control = SessionStateControl()
+        self.__session_control.setUploadedFile(self.__file_manager.getExtratoFile())
         self.__showInfo()
 
     def __showMainTitle(self) -> None:
@@ -52,9 +51,7 @@ class ExtratoGuiLocal:
         if os.path.isfile(self.__file_path):
             if self.__file_path != st.session_state.extrato_file:
                 self.__file_manager.setExtratoFile(self.__file_path)
-                self.__xls_reader.readExcelFile(self.__file_manager.getExtratoFile())
-                st.session_state.extrato_file = self.__file_manager.getExtratoFile()
-                st.session_state.extrato_from_excel = self.__xls_reader.getRawDataframe()
+                self.__session_control.setUploadedFile(self.__file_manager.getExtratoFile())
                 self.__showBadBehaviorInfo()
 
     def __showBadBehaviorInfo(self) -> None:
