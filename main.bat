@@ -1,1 +1,1 @@
-python -m streamlit run extrato/Extrato_local.py
+python -m streamlit run GUI/Extrato_local.py
