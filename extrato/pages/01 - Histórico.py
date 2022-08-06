@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 
+from extrato.lib.extrato_columns import ExtratoRawColumns
 from extrato.lib.extrato_dataframes_kit import ExtratoRawKit
 from extrato.lib.extrato_side_bar import ExtratoRawSideBar
 
@@ -9,9 +10,17 @@ class ExtratoRawTableInfo:
     def __init__(self) -> None:
         """Structure used to show an interactive table related to the 'Extrato'."""
         self.__filtered_fmtdf = ExtratoRawKit().getFormattedDataframe()
+        self.__columns_list = ExtratoRawColumns().getColumnsNameList()
 
     def __showMainTitle(self) -> None:
         st.write('#### Histórico de transações')
+    
+    def __showColumnsViewer(self):
+        columns_not_displayed = st.multiselect('Ocultar colunas:', self.__columns_list)
+        if columns_not_displayed:
+            if not self.__filtered_fmtdf.empty:
+                columns_displayed = [column for column in self.__columns_list if column not in columns_not_displayed]
+                self.__filtered_fmtdf = self.__filtered_fmtdf[columns_displayed]
     
     def __showDataframe(self) -> None:
         st.write("", self.__filtered_fmtdf.astype(str))
@@ -27,6 +36,7 @@ class ExtratoRawTableInfo:
     
     def showInfo(self) -> None:
         self.__showMainTitle()
+        self.__showColumnsViewer()
         self.__showDataframe()
 
 

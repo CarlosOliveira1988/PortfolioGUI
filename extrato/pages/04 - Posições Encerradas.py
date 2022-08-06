@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 
+from positions.lib.closed_columns import ClosedPositionDBColumns
 from positions.lib.closed_dataframes_kit import ClosedPositionDBKit
 from positions.lib.closed_side_bar import ClosedPositionDBSideBar
 
@@ -9,10 +10,18 @@ class ClosedPositionsTableInfo:
     def __init__(self) -> None:
         """Structure used to show an interactive table related to the 'Closed Positions'."""
         self.__filtered_fmtdf = ClosedPositionDBKit().getFormattedDataframe()
+        self.__columns_list = ClosedPositionDBColumns().getColumnsNameList()
 
     def __showMainTitle(self) -> None:
         st.write('#### Histórico de posições encerradas')
-    
+
+    def __showColumnsViewer(self):
+        columns_not_displayed = st.multiselect('Ocultar colunas:', self.__columns_list)
+        if columns_not_displayed:
+            if not self.__filtered_fmtdf.empty:
+                columns_displayed = [column for column in self.__columns_list if column not in columns_not_displayed]
+                self.__filtered_fmtdf = self.__filtered_fmtdf[columns_displayed]
+
     def __showDataframe(self) -> None:
         st.write("", self.__filtered_fmtdf.astype(str))
         expander = st.expander("Informações:")
@@ -31,6 +40,7 @@ class ClosedPositionsTableInfo:
     
     def showInfo(self) -> None:
         self.__showMainTitle()
+        self.__showColumnsViewer()
         self.__showDataframe()
 
 
