@@ -61,4 +61,4 @@ class ClosedPositionGUI:
 
 
 closed_position_gui = ClosedPositionGUI()
-closed_position_gui.setDataframe(st.session_state.extrato_from_excel)
+closed_position_gui.setDataframe(st.session_state.extrato_dataframe)

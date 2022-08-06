@@ -55,4 +55,4 @@ class ExtratoAccountsGUI:
 
 
 accounts_gui = ExtratoAccountsGUI()
-accounts_gui.setDataframe(st.session_state.extrato_from_excel)
+accounts_gui.setDataframe(st.session_state.extrato_dataframe)

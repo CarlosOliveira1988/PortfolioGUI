@@ -14,8 +14,8 @@ class SessionStateControl:
     def setUploadedFile(self, uploaded_file) -> None:
         if uploaded_file is not None:
             self.__xls_reader.readExcelFile(uploaded_file)
-            st.session_state.extrato_file = uploaded_file
-            st.session_state.extrato_from_excel = self.__xls_reader.getRawDataframe()
+            st.session_state.extrato_file_path = uploaded_file
+            st.session_state.extrato_dataframe = self.__xls_reader.getRawDataframe()
 
 
 class ExtratoGuiWeb:

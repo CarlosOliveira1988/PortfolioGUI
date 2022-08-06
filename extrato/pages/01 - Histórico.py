@@ -57,4 +57,4 @@ class ExtratoHistoryGUI:
 
 
 history_gui = ExtratoHistoryGUI()
-history_gui.setDataframe(st.session_state.extrato_from_excel)
+history_gui.setDataframe(st.session_state.extrato_dataframe)

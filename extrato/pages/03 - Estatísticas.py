@@ -88,4 +88,4 @@ class ExtratoStatisticsGUI:
 
 
 statistics_gui = ExtratoStatisticsGUI()
-statistics_gui.setDataframe(st.session_state.extrato_from_excel)
+statistics_gui.setDataframe(st.session_state.extrato_dataframe)
