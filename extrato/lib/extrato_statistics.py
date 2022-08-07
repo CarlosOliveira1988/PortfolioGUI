@@ -1,6 +1,6 @@
 import pandas as pd
 
-from common.dataframes_kit import SingleFormatter
+from common.formatter import SingleFormatter
 
 from extrato.lib.extrato_columns import ExtratoColumns
 from extrato.lib.extrato_dataframes_kit import ExtratoKit
