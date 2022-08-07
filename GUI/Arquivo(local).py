@@ -4,7 +4,7 @@ import streamlit as st
 
 from extrato.lib.extrato_file_manager import FileManager
 
-from GUI.Extrato import SessionStateControl
+from GUI.Arquivo import SessionStateControl
 
 
 class ExtratoGuiLocal:
