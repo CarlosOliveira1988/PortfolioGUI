@@ -1,9 +1,8 @@
 import locale
 
 import pandas as pd
-import numpy as np
 
-from common_lib.columns import ColumnsInterface
+from common.columns import ColumnsInterface
 
 
 class SingleFormatter:
@@ -11,7 +10,7 @@ class SingleFormatter:
         """Structure used to format values to perform 'nice visualization'."""
         self.__setFormatterLocalParameters()
 
-    def __setFormatterLocalParameters(self):
+    def __setFormatterLocalParameters(self) -> None:
         locale.setlocale(locale.LC_ALL, "pt_BR.UTF-8")
 
     def getMoneyString(self, value: str) -> str:
@@ -89,44 +88,3 @@ class DataframesKitFormatter:
     
     def getFormattedDataframe(self) -> pd.DataFrame:
         return self.__formatted_df.copy()
-
-
-class DataframesKitInterface:
-    def __init__(self, columns_object: ColumnsInterface) -> None:
-        """Structure to handle different types of dataframes.
-        
-        The main outputs of this class are:
-        - raw dataframe
-        - formatted dataframe
-        - nan dataframe
-        
-        Args:
-        - columns_object: any instance based on 'ColumnsInterface' class
-        """
-        self.__columns_object = columns_object
-        self.__kit_formatter = DataframesKitFormatter(self.__columns_object)
-        self._raw_df = pd.DataFrame(columns=self.__columns_object.getColumnsNameList())
-        self.formatDataframes()
-
-    def addColumnIfNotExists(self, dataframe):
-        # Create the column witn NaN values
-        for column, raw_column_obj in self.__columns_object.getRawColumnsDict().items():
-            if column not in dataframe.columns:
-                dataframe[column] = np.nan
-        return dataframe
-
-    def formatDataframes(self):
-        self.__kit_formatter.formatDataframes(self._raw_df)
-
-    def readExcelFile(self, file) -> None:
-        self._raw_df = self.addColumnIfNotExists(pd.read_excel(file))
-        self.formatDataframes()
-
-    def getRawDataframe(self) -> pd.DataFrame:
-        return self._raw_df.copy()
-    
-    def getNotNanDataframe(self) -> pd.DataFrame:
-        return self.__kit_formatter.getNotNanDataframe()
-    
-    def getFormattedDataframe(self) -> pd.DataFrame:
-        return self.__kit_formatter.getFormattedDataframe()

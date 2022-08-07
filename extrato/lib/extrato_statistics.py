@@ -1,9 +1,9 @@
 import pandas as pd
 
-from common_lib.dataframes_kit import SingleFormatter
+from common.formatter import SingleFormatter
 
-from extrato_lib.extrato_columns import ExtratoDBColumns
-from extrato_lib.extrato_dataframes_kit import ExtratoDBKit
+from extrato.lib.extrato_columns import ExtratoColumns
+from extrato.lib.extrato_dataframes_kit import ExtratoKit
 
 
 class StatisticsCell:
@@ -70,11 +70,11 @@ class StatisticsInterface:
         self.__initDataframes()
 
     def __initColumnVariables(self) -> None:
-        columns_object = ExtratoDBColumns()
+        columns_object = ExtratoColumns()
         self.__date_column = columns_object._date_col.getName()
 
     def __initDataframes(self) -> None:
-        self.__input_dataframe = ExtratoDBKit().getNotNanDataframe()
+        self.__input_dataframe = ExtratoKit().getNotNanDataframe()
         self.__output_dataframe = self.__getResultDataframe()
 
     def __getResultDataframe(self) -> pd.DataFrame:
@@ -84,7 +84,7 @@ class StatisticsInterface:
         df[self.__neg_operation] = df[self.__neg_operation] * (-1)
         return self.__setDateColumnAsIndex(df)
 
-    def __setStatisticsDataframe(self, df: pd.DataFrame) -> tuple:
+    def __setStatisticsDataframe(self, df: pd.DataFrame) -> None:
         self.__statistics.setPositiveValues(df, self.__pos_operation)
         self.__statistics.setNegativeValues(df, self.__neg_operation)
 
@@ -92,7 +92,7 @@ class StatisticsInterface:
         self.__output_dataframe = self.__getResultDataframe()
         self.__setStatisticsDataframe(self.__output_dataframe)
 
-    def __setDateColumnAsIndex(self, df):
+    def __setDateColumnAsIndex(self, df: pd.DataFrame) -> pd.DataFrame:
         return df.rename(columns={self.__date_column:'index'}).set_index('index')
 
     def __getFormattedString(self, sum_value: float, count_value: int) -> str:

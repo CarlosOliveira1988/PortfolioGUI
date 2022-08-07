@@ -1,1 +1,1 @@
-python -m streamlit run Extrato_local.py
+python -m streamlit run GUI/Arquivo(local).py

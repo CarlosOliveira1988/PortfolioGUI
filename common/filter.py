@@ -1,11 +1,11 @@
 import pandas as pd
 
-from extrato_lib.extrato_columns import ExtratoColumnsInterface
-from extrato_lib.extrato_dataframes_kit import ExtratoDataframesKitInterface
+from extrato.lib.extrato_columns import ExtratoColumns
+from extrato.lib.extrato_dataframes_kit import ExtratoKit
 
 
 class FilterInterface:
-    def __init__(self, df_interface_object: ExtratoDataframesKitInterface, columns_object: ExtratoColumnsInterface) -> None:
+    def __init__(self, df_interface_object: ExtratoKit, columns_object: ExtratoColumns) -> None:
         """Structure to apply filters to different types of ExtratoDataframesKitInterface objects.
                 
         The main outputs of this class are:
@@ -38,8 +38,8 @@ class FilterInterface:
             self._filtered_df = self._filtered_df.loc[self._filtered_df[column] == ticker]
             self._filtered_fmtdf = self._filtered_fmtdf.loc[self._filtered_fmtdf[column] == ticker]
 
-    def updateDataframe(self, file) -> None:
-        self.__df_interface_object.readExcelFile(file)
+    def updateDataframe(self, dataframe: pd.DataFrame) -> None:
+        self.__df_interface_object.setDataframe(dataframe)
         self._updateMainDataframes()
 
     def getDataframe(self) -> pd.DataFrame:

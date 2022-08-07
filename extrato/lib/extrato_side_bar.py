@@ -1,28 +1,21 @@
 import pandas as pd
 import streamlit as st
 
-from extrato_lib.extrato_columns import ExtratoColumnsInterface, ExtratoRawColumns, ExtratoDBColumns
-from extrato_lib.extrato_filter import ExtratoFilterInterface, ExtratoRawFilter, ExtratoDBFilter
+from extrato.lib.extrato_columns import ExtratoColumns
+from extrato.lib.extrato_filter import ExtratoFilter
 
 
-class ExtratoSideBarInterface:
+class ExtratoSideBar:
     def __init__(
         self,
-        columns_object: ExtratoColumnsInterface,
-        filter_object: ExtratoFilterInterface,
         market_filter = True,
         ticker_filter = True,
         operation_filter = True,
         period_filter = True,
     ) -> None:
-        """Structure to draw an 'Extrato Filter' Side Bar.
-        
-        Args:
-        - columns_object: any object instance inherited from 'ExtratoColumnsInterface'
-        - filter_object: any object instance inherited from 'ExtratoFilterInterface'
-        """
-        self.__columns_object = columns_object
-        self.__filter_object = filter_object
+        """Structure to draw an 'Extrato Filter' Side Bar."""
+        self.__columns_object = ExtratoColumns()
+        self.__filter_object = ExtratoFilter()
         self.__market_filter = market_filter
         self.__ticker_filter = ticker_filter
         self.__operation_filter = operation_filter
@@ -80,8 +73,8 @@ class ExtratoSideBarInterface:
         if self.__period_filter:
             self.__showPeriodFilter()
     
-    def updateDataframe(self, file) -> None:
-        self.__filter_object.updateDataframe(file)
+    def updateDataframe(self, dataframe: pd.DataFrame) -> None:
+        self.__filter_object.updateDataframe(dataframe)
         self.__showSideBar()
     
     def getFilteredDataframe(self) -> pd.DataFrame:
@@ -89,37 +82,3 @@ class ExtratoSideBarInterface:
     
     def getFilteredFormattedDataframe(self) -> pd.DataFrame:
         return self.__filter_object.getFormattedDataframe().copy()
-
-
-class ExtratoRawSideBar(ExtratoSideBarInterface):
-    def __init__(
-        self,
-        market_filter = True,
-        ticker_filter = True,
-        operation_filter = True,
-        period_filter = True,
-    ) -> None:
-        """Structure to draw an Extrato Filter's Side Bar."""
-        self.__columns_object = ExtratoRawColumns()
-        self.__filter_object = ExtratoRawFilter()
-        super().__init__(
-            self.__columns_object, self.__filter_object,
-            market_filter, ticker_filter, operation_filter, period_filter,
-        )
-
-
-class ExtratoDBSideBar(ExtratoSideBarInterface):
-    def __init__(
-        self,
-        market_filter = True,
-        ticker_filter = True,
-        operation_filter = True,
-        period_filter = True,
-    ) -> None:
-        """Structure to draw an Extrato Filter's Side Bar."""
-        self.__columns_object = ExtratoDBColumns()
-        self.__filter_object = ExtratoDBFilter()
-        super().__init__(
-            self.__columns_object, self.__filter_object,
-            market_filter, ticker_filter, operation_filter, period_filter,
-        )
