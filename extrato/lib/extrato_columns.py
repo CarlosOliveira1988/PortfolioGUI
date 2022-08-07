@@ -102,28 +102,28 @@ class ExtratoColumns(ColumnsInterface):
         # Columns to specify buy, sell and other special events
         self._quantity_col = self.addRawColumn("Quantidade", "number")
         self._unit_price_col = self.addRawColumn("Preço Unitário", "$")
-        
+
+        # "Preço Total": It could be not present in the User spreadsheet, but it is
+        # Anyway, the app may calculate it easily
+        self._total_price_col = self.addRawColumn("Preço Total", "$")
+
         # Costs
         self._taxes_col = self.addRawColumn("Taxas", "$")
         self._IR_col = self.addRawColumn("IR", "$")
-        
-        # Earnings
-        self._dividends_col = self.addRawColumn("Dividendos", "$")
-        self._JCP_col = self.addRawColumn("JCP", "$")
-        
-        # User notes
-        self._notes_col = self.addRawColumn("Notas", "string")
 
         # "Custo Total": It could be not present in the User spreadsheet, but it is
         # Anyway, the app may calculate it easily
-        self._total_price_col = self.addRawColumn("Preço Total", "$")
-        
-        # "Custo Total": It could be not present in the User spreadsheet, but it is
-        # Anyway, the app may calculate it easily
         self._total_costs_col = self.addRawColumn("Custo Total", "$")
-        
+
+        # Earnings
+        self._dividends_col = self.addRawColumn("Dividendos", "$")
+        self._JCP_col = self.addRawColumn("JCP", "$")
+
         # "Proventos Totais": It is NOT present in the User spreadsheet, but the app may calculate it easily
         self._total_earnings_col = self.addRawColumn("Proventos Totais", "$")
+
+        # User notes
+        self._notes_col = self.addRawColumn("Notas", "string")
 
         # The below columns can be extracted from the column 'Operação' and 'Preço Total'
         self._contributions_col = self.addRawColumn("Transferência", "$")

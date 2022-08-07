@@ -10,12 +10,26 @@ class ExtratoRawTableInfo:
     def __init__(self) -> None:
         """Structure used to show an interactive table related to the 'Extrato'."""
         self.__filtered_fmtdf = ExtratoKit().getFormattedDataframe()
-        self.__columns_list = ExtratoColumns().getColumnsNameList()
+        self.__hideColumns()
+
+    def __hideColumns(self):
+        extrato_columns = ExtratoColumns()
+        self.__columns_list = extrato_columns.getColumnsNameList()
+        self.__columns_list.remove(extrato_columns._contributions_col.getName())
+        self.__columns_list.remove(extrato_columns._rescues_col.getName())
+        self.__columns_list.remove(extrato_columns._buy_price_col.getName())
+        self.__columns_list.remove(extrato_columns._sell_price_col.getName())
+        self.__columns_list.remove(extrato_columns._slice_index_col.getName())
+        self.__columns_list.remove(extrato_columns._slice_type_col.getName())
 
     def __showMainTitle(self) -> None:
         st.write('#### Histórico de transações')
     
     def __showColumnsViewer(self):
+        # First columns filter to limit the columns displayed
+        self.__filtered_fmtdf = self.__filtered_fmtdf[self.__columns_list]
+        
+        # Additional columns filter that works according to the user selection
         columns_not_displayed = st.multiselect('Ocultar colunas:', self.__columns_list)
         if columns_not_displayed:
             if not self.__filtered_fmtdf.empty:
