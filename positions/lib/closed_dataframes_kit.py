@@ -1,41 +1,21 @@
 import pandas as pd
 
-from common.dataframes_kit import DataframesKitInterface, DataframesDBKitInterface
+from common.dataframes_kit import DataframesKitInterface
 
 from extrato.lib.extrato_columns import ExtratoOperations
-from extrato.lib.extrato_dataframes_kit import ExtratoDBKit, ExtratoDBSlicer
+from extrato.lib.extrato_dataframes_kit import ExtratoKit, ExtratoSlicer
 
-from positions.lib.closed_columns import ClosedPositionRawColumns, ClosedPositionDBColumns
-
-
-class ClosedPositionKitInterface(DataframesKitInterface):
-    def __init__(self, columns_object) -> None:
-        """Structure to handle a Pandas dataframe for Closed Investment Positions."""
-        self.__columns_object = columns_object
-        super().__init__(self.__columns_object)
+from positions.lib.closed_columns import ClosedPositionColumns
 
 
-class ClosedPositionRawKit(ClosedPositionKitInterface):
+class ClosedPositionKit(DataframesKitInterface):
     def __init__(self) -> None:
-        """Structure to handle a Pandas dataframe to show Closed Positions.
-        
-        The 'RAW' means a data gotten without an extra calculation effort of the generated class.
-        """
-        self.__columns_object = ClosedPositionRawColumns()
-        super().__init__(self.__columns_object)
-
-
-class ClosedPositionDBKit(DataframesDBKitInterface):
-    def __init__(self) -> None:
-        """Structure to handle a Pandas dataframe to show Closed Positions.
-        
-        'DBKit' means a data gotten with an extra calculation effort of the generated class.
-        """
-        self.__columns_object = ClosedPositionDBColumns()
+        """Structure to handle a Pandas dataframe to show Closed Positions."""
+        self.__columns_object = ClosedPositionColumns()
         super().__init__(self.__columns_object)
         
-        self.__extrato_kit_object = ExtratoDBKit()
-        self.__extrato_slicer = ExtratoDBSlicer()
+        self.__extrato_kit_object = ExtratoKit()
+        self.__extrato_slicer = ExtratoSlicer()
         self.__operations_object = ExtratoOperations()
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()
@@ -409,8 +389,7 @@ class ClosedPositionDBKit(DataframesDBKitInterface):
         self.resetDataframeIndex()
 
 
-    def setDataframe(self, dataframe: pd.DataFrame) -> None:
-        """Method Overridden from 'DataframesDBKitInterface' class."""
+    def setExtratoDataframe(self, dataframe: pd.DataFrame) -> None:
         self.__extrato_kit_object.setDataframe(dataframe)
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()

@@ -1,16 +1,16 @@
 import pandas as pd
 import streamlit as st
 
-from extrato.lib.extrato_columns import ExtratoRawColumns
-from extrato.lib.extrato_dataframes_kit import ExtratoRawKit
-from extrato.lib.extrato_side_bar import ExtratoRawSideBar
+from extrato.lib.extrato_columns import ExtratoColumns
+from extrato.lib.extrato_dataframes_kit import ExtratoKit
+from extrato.lib.extrato_side_bar import ExtratoSideBar
 
 
 class ExtratoRawTableInfo:
     def __init__(self) -> None:
         """Structure used to show an interactive table related to the 'Extrato'."""
-        self.__filtered_fmtdf = ExtratoRawKit().getFormattedDataframe()
-        self.__columns_list = ExtratoRawColumns().getColumnsNameList()
+        self.__filtered_fmtdf = ExtratoKit().getFormattedDataframe()
+        self.__columns_list = ExtratoColumns().getColumnsNameList()
 
     def __showMainTitle(self) -> None:
         st.write('#### Histórico de transações')
@@ -43,7 +43,7 @@ class ExtratoRawTableInfo:
 class ExtratoHistoryGUI:
     def __init__(self) -> None:
         """Structure used to show tables and filters related to Extrato."""
-        self.__side_bar = ExtratoRawSideBar()
+        self.__side_bar = ExtratoSideBar()
         self.__table = ExtratoRawTableInfo()
         self.__setDataframes()
 

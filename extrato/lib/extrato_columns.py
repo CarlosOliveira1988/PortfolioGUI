@@ -73,9 +73,17 @@ class InvestmentPositionType:
         return self.__opened_position
 
 
-class ExtratoColumnsInterface(ColumnsInterface):
+class ExtratoColumns(ColumnsInterface):
     def __init__(self) -> None:
-        """Structure to define an interface of 'Extrato' columns."""
+        """Structure to define all columns related to the 'Extrato Database'.
+        
+        This class was created in order to make easier some calculations, such as:
+        - sum of the 'dividends', 'costs'
+        - count the 'Buy' and 'Sell' operations
+        - etc.
+        
+        Basically, our target is splitting the 'Extrato' columns in several new ones.
+        """
         super().__init__()
         
         # Date of the spreadsheet entries
@@ -105,29 +113,6 @@ class ExtratoColumnsInterface(ColumnsInterface):
         
         # User notes
         self._notes_col = self.addRawColumn("Notas", "string")
-
-
-class ExtratoRawColumns(ExtratoColumnsInterface):
-    def __init__(self) -> None:
-        """Structure to define all the 'RAW' Extrato columns.
-        
-        All the defined columns must be present in the Extrato Spreadsheet.
-        """
-        super().__init__()
-
-
-class ExtratoDBColumns(ExtratoColumnsInterface):
-    def __init__(self) -> None:
-        """Structure to define all columns related to the 'Extrato Database'.
-        
-        This class was created in order to make easier some calculations, such as:
-        - sum of the 'dividends', 'costs'
-        - count the 'Buy' and 'Sell' operations
-        - etc.
-        
-        Basically, our target is splitting the 'Extrato' columns in several new ones.
-        """
-        super().__init__()
 
         # "Custo Total": It could be not present in the User spreadsheet, but it is
         # Anyway, the app may calculate it easily

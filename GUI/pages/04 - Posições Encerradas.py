@@ -1,16 +1,16 @@
 import pandas as pd
 import streamlit as st
 
-from positions.lib.closed_columns import ClosedPositionRawColumns
-from positions.lib.closed_dataframes_kit import ClosedPositionRawKit
-from positions.lib.closed_side_bar import ClosedPositionRawSideBar
+from positions.lib.closed_columns import ClosedPositionColumns
+from positions.lib.closed_dataframes_kit import ClosedPositionKit
+from positions.lib.closed_side_bar import ClosedPositionSideBar
 
 
 class ClosedPositionsTableInfo:
     def __init__(self) -> None:
         """Structure used to show an interactive table related to the 'Closed Positions'."""
-        self.__filtered_fmtdf = ClosedPositionRawKit().getFormattedDataframe()
-        self.__columns_list = ClosedPositionRawColumns().getColumnsNameList()
+        self.__filtered_fmtdf = ClosedPositionKit().getFormattedDataframe()
+        self.__columns_list = ClosedPositionColumns().getColumnsNameList()
 
     def __showMainTitle(self) -> None:
         st.write('#### Histórico de posições encerradas')
@@ -47,7 +47,7 @@ class ClosedPositionsTableInfo:
 class ClosedPositionGUI:
     def __init__(self) -> None:
         """Structure used to show tables and filters related to Closed Positions."""
-        self.__side_bar = ClosedPositionRawSideBar()
+        self.__side_bar = ClosedPositionSideBar()
         self.__table = ClosedPositionsTableInfo()
         self.__setDataframes()
 

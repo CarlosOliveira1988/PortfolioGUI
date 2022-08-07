@@ -1,11 +1,11 @@
 import pandas as pd
 
-from extrato.lib.extrato_columns import ExtratoColumnsInterface
-from extrato.lib.extrato_dataframes_kit import ExtratoDataframesKitInterface
+from extrato.lib.extrato_columns import ExtratoColumns
+from extrato.lib.extrato_dataframes_kit import ExtratoKit
 
 
 class FilterInterface:
-    def __init__(self, df_interface_object: ExtratoDataframesKitInterface, columns_object: ExtratoColumnsInterface) -> None:
+    def __init__(self, df_interface_object: ExtratoKit, columns_object: ExtratoColumns) -> None:
         """Structure to apply filters to different types of ExtratoDataframesKitInterface objects.
                 
         The main outputs of this class are:

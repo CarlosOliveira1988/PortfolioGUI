@@ -1,8 +1,8 @@
 import pandas as pd
 import streamlit as st
 
-from extrato.lib.extrato_columns import ExtratoDBColumns
-from extrato.lib.extrato_side_bar import ExtratoDBSideBar
+from extrato.lib.extrato_columns import ExtratoColumns
+from extrato.lib.extrato_side_bar import ExtratoSideBar
 from extrato.lib.extrato_statistics import StatisticsInterface
 
 
@@ -15,7 +15,7 @@ class ExtratoAssetsInfo:
         - column 'Venda': positive values (put money in the account)
         - column 'Compra': negative values (take money out the account)
         """
-        self.__columns_object = ExtratoDBColumns()
+        self.__columns_object = ExtratoColumns()
         self.__statistics = StatisticsInterface(
             self.__columns_object._sell_price_col.getName(),
             self.__columns_object._buy_price_col.getName(),
@@ -46,7 +46,7 @@ class ExtratoEarnsCostsInfo:
         - column 'Proventos Totais': positive values (put money in the account)
         - column 'Custo Total': negative values (take money out the account)
         """
-        self.__columns_object = ExtratoDBColumns()
+        self.__columns_object = ExtratoColumns()
         self.__statistics = StatisticsInterface(
             self.__columns_object._total_earnings_col.getName(),
             self.__columns_object._total_costs_col.getName(),
@@ -71,7 +71,7 @@ class ExtratoEarnsCostsInfo:
 class ExtratoStatisticsGUI:
     def __init__(self) -> None:
         """Structure used to show data, graphs and filters related to Extrato."""
-        self.__side_bar = ExtratoDBSideBar(operation_filter=False)
+        self.__side_bar = ExtratoSideBar(operation_filter=False)
         self.__assets_info = ExtratoAssetsInfo()
         self.__earns_costs_info = ExtratoEarnsCostsInfo()
         self.__setDataframes()

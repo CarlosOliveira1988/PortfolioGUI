@@ -1,15 +1,13 @@
 import pandas as pd
 import streamlit as st
 
-from positions.lib.closed_columns import ClosedPositionColumnsInterface, ClosedPositionRawColumns, ClosedPositionDBColumns
-from positions.lib.closed_filter import ClosedPositionFilterInterface, ClosedPositionRawFilter, ClosedPositionDBFilter
+from positions.lib.closed_columns import ClosedPositionColumns
+from positions.lib.closed_filter import ClosedPositionFilter
 
 
-class ClosedPositionSideBarInterface:
+class ClosedPositionSideBar:
     def __init__(
         self,
-        columns_object: ClosedPositionColumnsInterface,
-        filter_object: ClosedPositionFilterInterface,
         market_filter = True,
         ticker_filter = True,
         period_filter = True,
@@ -20,8 +18,8 @@ class ClosedPositionSideBarInterface:
         - columns_object: any object instance inherited from 'ClosedPositionDBColumns'
         - filter_object: any object instance inherited from 'ClosedPositionDBFilter'
         """
-        self.__columns_object = columns_object
-        self.__filter_object = filter_object
+        self.__columns_object = ClosedPositionColumns()
+        self.__filter_object = ClosedPositionFilter()
         self.__market_filter = market_filter
         self.__ticker_filter = ticker_filter
         self.__period_filter = period_filter
@@ -79,35 +77,3 @@ class ClosedPositionSideBarInterface:
     
     def getFilteredFormattedDataframe(self) -> pd.DataFrame:
         return self.__filter_object.getFormattedDataframe().copy()
-
-
-class ClosedPositionRawSideBar(ClosedPositionSideBarInterface):
-    def __init__(
-        self,
-        market_filter = True,
-        ticker_filter = True,
-        period_filter = True,
-    ) -> None:
-        """Structure to draw a Closed Position Filter's Side Bar."""
-        self.__columns_object = ClosedPositionRawColumns()
-        self.__filter_object = ClosedPositionRawFilter()
-        super().__init__(
-            self.__columns_object, self.__filter_object,
-            market_filter, ticker_filter, period_filter,
-        )
-
-
-class ClosedPositionDBSideBar(ClosedPositionSideBarInterface):
-    def __init__(
-        self,
-        market_filter = True,
-        ticker_filter = True,
-        period_filter = True,
-    ) -> None:
-        """Structure to draw a Closed Position Filter's Side Bar."""
-        self.__columns_object = ClosedPositionDBColumns()
-        self.__filter_object = ClosedPositionDBFilter()
-        super().__init__(
-            self.__columns_object, self.__filter_object,
-            market_filter, ticker_filter, period_filter,
-        )

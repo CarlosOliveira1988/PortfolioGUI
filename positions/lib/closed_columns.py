@@ -1,7 +1,7 @@
 from common.columns import ColumnsInterface
 
 
-class ClosedPositionColumnsInterface(ColumnsInterface):
+class ClosedPositionColumns(ColumnsInterface):
     def __init__(self) -> None:
         """Structure to define all columns related to 'Closed Position Database'.
         
@@ -74,29 +74,3 @@ class ClosedPositionColumnsInterface(ColumnsInterface):
         self._net_margin_p_col = self.addRawColumn("Margem Líquida (%)", "%")
         # self._benchmark_IPCA_col = self.addRawColumn("IPCA+ (a.a.)", "%") # comparison to IPCA treasury in the period
         # self._benchmark_CDI_col = self.addRawColumn("*CDI (a.a.)", "%") # comparison to CDI in the period
-
-
-class ClosedPositionRawColumns(ClosedPositionColumnsInterface):
-    def __init__(self) -> None:
-        """Structure to define all columns related to 'Closed Position Database'.
-        
-        'Closed Position' means an interval of 'buy' and 'sell' operations that where
-        'buy_quantity.sum()' is equal to 'sell_quantity.sum()'.
-        
-        All values related to the 'Closed Position' are registered in the User Extrato
-        spreadsheet.
-        """
-        super().__init__()
-
-
-class ClosedPositionDBColumns(ClosedPositionColumnsInterface):
-    def __init__(self) -> None:
-        """Structure to define all columns related to 'Closed Position Database'.
-        
-        'Closed Position' means an interval of 'buy' and 'sell' operations that where
-        'buy_quantity.sum()' is equal to 'sell_quantity.sum()'.
-        
-        All values related to the 'Closed Position' are registered in the User Extrato
-        spreadsheet.
-        """
-        super().__init__()

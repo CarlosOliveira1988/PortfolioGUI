@@ -2,7 +2,7 @@ import streamlit as st
 
 from extrato.lib.extrato_xls_reader import ExtratoExcelReader
 
-from positions.lib.closed_dataframes_kit import ClosedPositionDBKit
+from positions.lib.closed_dataframes_kit import ClosedPositionKit
 
 
 class SessionStateControl:
@@ -12,7 +12,7 @@ class SessionStateControl:
         Session States in Streamlit work as global variables and they are acessed maily by the Streamlit Pages.
         """
         self.__xls_reader = ExtratoExcelReader()
-        self.__closed_kit = ClosedPositionDBKit()
+        self.__closed_kit = ClosedPositionKit()
 
     def __saveStreamlitSessionState(self, uploaded_file):
         st.session_state.extrato_file_path = uploaded_file
@@ -22,7 +22,7 @@ class SessionStateControl:
     def setUploadedFile(self, uploaded_file) -> None:
         if uploaded_file is not None:
             self.__xls_reader.readExcelFile(uploaded_file)
-            self.__closed_kit.setDataframe(self.__xls_reader.getRawDataframe())
+            self.__closed_kit.setExtratoDataframe(self.__xls_reader.getRawDataframe())
             self.__saveStreamlitSessionState(uploaded_file)
 
 

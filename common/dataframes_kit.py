@@ -100,6 +100,8 @@ class DataframesKitInterface:
         - formatted dataframe
         - nan dataframe
         
+        Also, it is useful to perform some calculation with the dataframes.
+        
         Args:
         - columns_object: any instance based on 'ColumnsInterface' class
         """
@@ -108,9 +110,11 @@ class DataframesKitInterface:
         self._raw_df = pd.DataFrame(columns=self.__columns_object.getColumnsNameList())
         self.formatDataframes()
 
+
     def setDataframe(self, dataframe: pd.DataFrame) -> None:
         self._raw_df = self.addColumnIfNotExists(dataframe)
         self.formatDataframes()
+
 
     def addColumnIfNotExists(self, dataframe) -> pd.DataFrame:
         # Create the column witn NaN values
@@ -131,19 +135,10 @@ class DataframesKitInterface:
     def getFormattedDataframe(self) -> pd.DataFrame:
         return self.__kit_formatter.getFormattedDataframe()
 
+
     def getColumnsObject(self) -> ColumnsInterface:
         return self.__columns_object
 
-
-class DataframesDBKitInterface(DataframesKitInterface):
-    def __init__(self, columns_object: ColumnsInterface) -> None:
-        """Structure to handle a Pandas dataframe to perform some calculations.
-        
-        Args:
-        - columns_object: any object instance inherited from 'ColumnsInterface'
-        """
-        self.__columns_object = columns_object
-        super().__init__(self.__columns_object)
 
     def getNonDuplicatedListFromColumn(self, target_col: str, dropna=True, sorted=True) -> list:
         """Return a non-duplicated values list from a given column."""
@@ -160,6 +155,7 @@ class DataframesDBKitInterface(DataframesKitInterface):
                 df_column_list.sort()
         
         return df_column_list
+
 
     def subtractTwoColumns(self, col_A: str, col_B: str, result_col: str) -> None:
         """Subtract the 'col_A' and 'col_B' to put the result in the 'result_col'."""
@@ -179,6 +175,7 @@ class DataframesDBKitInterface(DataframesKitInterface):
             self._raw_df[col_B].where(self._raw_df[col_B] != 0, np.nan)
         )
 
+
     def copyColumnToColumn(self, target_col: str, result_col: str) -> None:
         """Copy the 'target_col' data to the 'result_col'."""
         self._raw_df[result_col] = self._raw_df[target_col]
@@ -191,6 +188,7 @@ class DataframesDBKitInterface(DataframesKitInterface):
         self._raw_df[target_col] = self._raw_df[target_col].where(
             self._raw_df[except_col] == except_val, target_val
         )
+
 
     def appendNewDataLine(self, data_list: list, column_name_list: list) -> None:
         """Insert a new data line given the column name and data lists."""

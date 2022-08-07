@@ -1,43 +1,20 @@
 import numpy as np
 import pandas as pd
 
-from common.dataframes_kit import DataframesKitInterface, DataframesDBKitInterface
+from common.dataframes_kit import DataframesKitInterface
 from common.raw_column import RawColumn
 
-from extrato.lib.extrato_columns import (
-    ExtratoOperations, ExtratoColumnsInterface, ExtratoRawColumns, ExtratoDBColumns, InvestmentPositionType
-)
+from extrato.lib.extrato_columns import (ExtratoOperations, InvestmentPositionType, ExtratoColumns)
 
 
-class ExtratoDataframesKitInterface(DataframesKitInterface):
-    def __init__(self, columns_object: ExtratoColumnsInterface) -> None:
-        """Structure to handle a group of Pandas dataframes for 'Extrato' objects.
-        
-        Args:
-        - columns_object: any object instance inherited from 'ExtratoColumnsInterface'
-        """
-        self.__columns_object = columns_object
-        super().__init__(self.__columns_object)
-
-
-class ExtratoRawKit(ExtratoDataframesKitInterface):
-    def __init__(self) -> None:
-        """Structure to handle a Pandas dataframe based on Raw Extrato spreadsheet.
-        
-        The 'RAW' means a data gotten without an extra calculation effort of the generated class.
-        """
-        self.__columns_object = ExtratoRawColumns()
-        super().__init__(self.__columns_object)
-
-
-class ExtratoDBSlicer:
+class ExtratoSlicer:
     def __init__(self) -> None:
         """Structure to create slices based on Extrato dataframes.
         
         Slices are small filtered dataframes used to get useful information such as
         Opened and Closed Investment Position.
         """
-        self.__columns_object = ExtratoDBColumns()
+        self.__columns_object = ExtratoColumns()
         self.__extrato_slice_index_col = self.__columns_object._slice_index_col.getName()
         self.__extrato_slice_type_col = self.__columns_object._slice_type_col.getName()
 
@@ -157,14 +134,14 @@ class ExtratoDBSlicer:
         return sum(extrato_df_filtered[extrato_raw_column_obj.getName()].to_list())
 
 
-class ExtratoDBKit(DataframesDBKitInterface):
+class ExtratoKit(DataframesKitInterface):
     def __init__(self) -> None:
         """Structure to handle a Pandas dataframe based on Extrato Database.
         
         'DBKit' means a data gotten with an extra calculation effort of the generated class.
         """
         self.__operations_object = ExtratoOperations()
-        self.__columns_object = ExtratoDBColumns()
+        self.__columns_object = ExtratoColumns()
         super().__init__(self.__columns_object)
         self.__addValuesToCalculatedColumns()
         self.formatDataframes()

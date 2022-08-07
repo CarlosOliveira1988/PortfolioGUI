@@ -1,8 +1,8 @@
 import pandas as pd
 import streamlit as st
 
-from extrato.lib.extrato_columns import ExtratoDBColumns
-from extrato.lib.extrato_side_bar import ExtratoDBSideBar
+from extrato.lib.extrato_columns import ExtratoColumns
+from extrato.lib.extrato_side_bar import ExtratoSideBar
 from extrato.lib.extrato_statistics import StatisticsInterface
 
 
@@ -15,7 +15,7 @@ class ExtratoAccountInfo:
         - column 'Transferência': positive values (put money in the account)
         - column 'Resgate': negative values (take money out the account)
         """
-        self.__columns_object = ExtratoDBColumns()
+        self.__columns_object = ExtratoColumns()
         self.__statistics = StatisticsInterface(
             self.__columns_object._contributions_col.getName(),
             self.__columns_object._rescues_col.getName(),
@@ -41,7 +41,7 @@ class ExtratoAccountInfo:
 class ExtratoAccountsGUI:
     def __init__(self) -> None:
         """Structure used to show data, graphs and filters related to Extrato."""
-        self.__side_bar = ExtratoDBSideBar(market_filter=False, ticker_filter=False, operation_filter=False)
+        self.__side_bar = ExtratoSideBar(market_filter=False, ticker_filter=False, operation_filter=False)
         self.__account_info = ExtratoAccountInfo()
         self.__setDataframes()
 

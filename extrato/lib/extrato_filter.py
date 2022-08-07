@@ -2,23 +2,20 @@ import pandas as pd
 
 from common.filter import FilterInterface
 
-from extrato.lib.extrato_columns import ExtratoColumnsInterface, ExtratoRawColumns, ExtratoDBColumns
-from extrato.lib.extrato_dataframes_kit import ExtratoDataframesKitInterface, ExtratoRawKit, ExtratoDBKit
+from extrato.lib.extrato_columns import ExtratoColumns
+from extrato.lib.extrato_dataframes_kit import ExtratoKit
 
 
-class ExtratoFilterInterface(FilterInterface):
-    def __init__(
-        self, columns_object: ExtratoColumnsInterface,
-        df_interface_object: ExtratoDataframesKitInterface
-    ) -> None:
+class ExtratoFilter(FilterInterface):
+    def __init__(self) -> None:
         """Structure to apply filters based on Extrato objects.
         
         Args:
         - columns_object: any object instance inherited from 'ColumnsInterface'
         - df_interface_object: any object instance inherited from 'DataframesKitInterface'
         """
-        self.__columns_object = columns_object
-        self.__df_interface_object = df_interface_object
+        self.__columns_object = ExtratoColumns()
+        self.__df_interface_object = ExtratoKit()
         super().__init__(self.__df_interface_object, self.__columns_object)
     
     def applyOperationFilter(self, operation: str) -> None:
@@ -32,15 +29,3 @@ class ExtratoFilterInterface(FilterInterface):
         if start_date and end_date:
             self._filtered_df = self._filtered_df.loc[(start_date <= self._filtered_df[column]) & (self._filtered_df[column] <= end_date)]
             self._filtered_fmtdf = self._filtered_fmtdf.loc[(start_date <= self._filtered_fmtdf[column]) & (self._filtered_fmtdf[column] <= end_date)]
-
-
-class ExtratoRawFilter(ExtratoFilterInterface):
-    def __init__(self) -> None:
-        """Structure to apply filters based on 'RAW' Extrato objects."""
-        super().__init__(ExtratoRawColumns(), ExtratoRawKit())
-
-
-class ExtratoDBFilter(ExtratoFilterInterface):
-    def __init__(self) -> None:
-        """Structure to apply filters based on 'Database' Extrato objects."""
-        super().__init__(ExtratoDBColumns(), ExtratoDBKit())
