@@ -2,17 +2,13 @@ import pandas as pd
 
 from common.filter import FilterInterface
 
-from positions.lib.closed_columns import ClosedPositionDBColumns
-from positions.lib.closed_dataframes_kit import ClosedPositionDBKit
+from positions.lib.closed_columns import ClosedPositionRawColumns, ClosedPositionDBColumns
+from positions.lib.closed_dataframes_kit import ClosedPositionRawKit, ClosedPositionDBKit
 
-class ClosedPositionDBFilter(FilterInterface):
-    def __init__(self, columns_object: ClosedPositionDBColumns, df_interface_object: ClosedPositionDBKit) -> None:
-        """Structure to apply filters based on 'Closed Position' objects.
-        
-        Args:
-        - columns_object: any object instance inherited from 'ClosedPositionDBColumns'
-        - df_interface_object: any object instance inherited from 'ClosedPositionDBKit'
-        """
+
+class ClosedPositionFilterInterface(FilterInterface):
+    def __init__(self, columns_object, df_interface_object) -> None:
+        """Structure to apply filters based on 'Closed Position' objects."""
         self.__columns_object = columns_object
         self.__df_interface_object = df_interface_object
         super().__init__(self.__df_interface_object, self.__columns_object)
@@ -29,3 +25,18 @@ class ClosedPositionDBFilter(FilterInterface):
                 (start_date <= self._filtered_fmtdf[initial_date_column]) &
                 (self._filtered_fmtdf[final_date_column] <= end_date)
             ]
+
+class ClosedPositionRawFilter(ClosedPositionFilterInterface):
+    def __init__(self) -> None:
+        """Structure to apply filters based on 'Closed Position' objects."""
+        self.__columns_object = ClosedPositionRawColumns()
+        self.__df_interface_object = ClosedPositionRawKit()
+        super().__init__(self.__columns_object, self.__df_interface_object)
+
+
+class ClosedPositionDBFilter(ClosedPositionFilterInterface):
+    def __init__(self) -> None:
+        """Structure to apply filters based on 'Closed Position' objects."""
+        self.__columns_object = ClosedPositionDBColumns()
+        self.__df_interface_object = ClosedPositionDBKit()
+        super().__init__(self.__columns_object, self.__df_interface_object)

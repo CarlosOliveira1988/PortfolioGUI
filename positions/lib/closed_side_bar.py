@@ -1,16 +1,15 @@
 import pandas as pd
 import streamlit as st
 
-from positions.lib.closed_columns import ClosedPositionDBColumns
-from positions.lib.closed_filter import ClosedPositionDBFilter
-from positions.lib.closed_dataframes_kit import ClosedPositionDBKit
+from positions.lib.closed_columns import ClosedPositionColumnsInterface, ClosedPositionRawColumns, ClosedPositionDBColumns
+from positions.lib.closed_filter import ClosedPositionFilterInterface, ClosedPositionRawFilter, ClosedPositionDBFilter
 
 
 class ClosedPositionSideBarInterface:
     def __init__(
         self,
-        columns_object: ClosedPositionDBColumns,
-        filter_object: ClosedPositionDBFilter,
+        columns_object: ClosedPositionColumnsInterface,
+        filter_object: ClosedPositionFilterInterface,
         market_filter = True,
         ticker_filter = True,
         period_filter = True,
@@ -82,6 +81,21 @@ class ClosedPositionSideBarInterface:
         return self.__filter_object.getFormattedDataframe().copy()
 
 
+class ClosedPositionRawSideBar(ClosedPositionSideBarInterface):
+    def __init__(
+        self,
+        market_filter = True,
+        ticker_filter = True,
+        period_filter = True,
+    ) -> None:
+        """Structure to draw a Closed Position Filter's Side Bar."""
+        self.__columns_object = ClosedPositionRawColumns()
+        self.__filter_object = ClosedPositionRawFilter()
+        super().__init__(
+            self.__columns_object, self.__filter_object,
+            market_filter, ticker_filter, period_filter,
+        )
+
 
 class ClosedPositionDBSideBar(ClosedPositionSideBarInterface):
     def __init__(
@@ -92,8 +106,7 @@ class ClosedPositionDBSideBar(ClosedPositionSideBarInterface):
     ) -> None:
         """Structure to draw a Closed Position Filter's Side Bar."""
         self.__columns_object = ClosedPositionDBColumns()
-        self.__df_interface_object = ClosedPositionDBKit()
-        self.__filter_object = ClosedPositionDBFilter(self.__columns_object, self.__df_interface_object)
+        self.__filter_object = ClosedPositionDBFilter()
         super().__init__(
             self.__columns_object, self.__filter_object,
             market_filter, ticker_filter, period_filter,

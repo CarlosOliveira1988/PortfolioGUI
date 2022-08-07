@@ -1,14 +1,36 @@
 import pandas as pd
 
-from extrato.lib.extrato_columns import ExtratoOperations
-from extrato.lib.extrato_dataframes_kit import DataframesDBKitInterface, ExtratoDBKit, ExtratoDBSlicer
+from common.dataframes_kit import DataframesKitInterface, DataframesDBKitInterface
 
-from positions.lib.closed_columns import ClosedPositionDBColumns
+from extrato.lib.extrato_columns import ExtratoOperations
+from extrato.lib.extrato_dataframes_kit import ExtratoDBKit, ExtratoDBSlicer
+
+from positions.lib.closed_columns import ClosedPositionRawColumns, ClosedPositionDBColumns
+
+
+class ClosedPositionKitInterface(DataframesKitInterface):
+    def __init__(self, columns_object) -> None:
+        """Structure to handle a Pandas dataframe for Closed Investment Positions."""
+        self.__columns_object = columns_object
+        super().__init__(self.__columns_object)
+
+
+class ClosedPositionRawKit(ClosedPositionKitInterface):
+    def __init__(self) -> None:
+        """Structure to handle a Pandas dataframe to show Closed Positions.
+        
+        The 'RAW' means a data gotten without an extra calculation effort of the generated class.
+        """
+        self.__columns_object = ClosedPositionRawColumns()
+        super().__init__(self.__columns_object)
 
 
 class ClosedPositionDBKit(DataframesDBKitInterface):
     def __init__(self) -> None:
-        """Structure to handle a Pandas dataframe to show Closed Positions."""
+        """Structure to handle a Pandas dataframe to show Closed Positions.
+        
+        'DBKit' means a data gotten with an extra calculation effort of the generated class.
+        """
         self.__columns_object = ClosedPositionDBColumns()
         super().__init__(self.__columns_object)
         

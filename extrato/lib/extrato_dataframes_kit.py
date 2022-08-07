@@ -22,14 +22,21 @@ class ExtratoDataframesKitInterface(DataframesKitInterface):
 
 class ExtratoRawKit(ExtratoDataframesKitInterface):
     def __init__(self) -> None:
-        """Structure to handle a Pandas dataframe based on Raw Extrato spreadsheet."""
+        """Structure to handle a Pandas dataframe based on Raw Extrato spreadsheet.
+        
+        The 'RAW' means a data gotten without an extra calculation effort of the generated class.
+        """
         self.__columns_object = ExtratoRawColumns()
         super().__init__(self.__columns_object)
 
 
 class ExtratoDBSlicer:
     def __init__(self) -> None:
-        """Structure to create slices based on Extrato dataframes."""
+        """Structure to create slices based on Extrato dataframes.
+        
+        Slices are small filtered dataframes used to get useful information such as
+        Opened and Closed Investment Position.
+        """
         self.__columns_object = ExtratoDBColumns()
         self.__extrato_slice_index_col = self.__columns_object._slice_index_col.getName()
         self.__extrato_slice_type_col = self.__columns_object._slice_type_col.getName()
@@ -152,7 +159,10 @@ class ExtratoDBSlicer:
 
 class ExtratoDBKit(DataframesDBKitInterface):
     def __init__(self) -> None:
-        """Structure to handle a Pandas dataframe based on Extrato Database."""
+        """Structure to handle a Pandas dataframe based on Extrato Database.
+        
+        'DBKit' means a data gotten with an extra calculation effort of the generated class.
+        """
         self.__operations_object = ExtratoOperations()
         self.__columns_object = ExtratoDBColumns()
         super().__init__(self.__columns_object)
